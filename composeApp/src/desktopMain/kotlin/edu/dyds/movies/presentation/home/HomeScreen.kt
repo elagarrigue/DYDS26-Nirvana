@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package edu.dyds.movies
+package edu.dyds.movies.presentation.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +25,9 @@ import dydsproject.composeapp.generated.resources.error
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
 import org.jetbrains.compose.resources.stringResource
+import edu.dyds.movies.presentation.MoviesViewModel
+import edu.dyds.movies.presentation.utils.LoadingIndicator
+import edu.dyds.movies.presentation.utils.NoResults
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

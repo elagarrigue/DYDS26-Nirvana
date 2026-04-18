@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package edu.dyds.movies
+package edu.dyds.movies.presentation.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -26,6 +26,9 @@ import coil3.compose.AsyncImage
 import dydsproject.composeapp.generated.resources.*
 import edu.dyds.movies.domain.entity.Movie
 import org.jetbrains.compose.resources.stringResource
+import edu.dyds.movies.presentation.MoviesViewModel
+import edu.dyds.movies.presentation.utils.LoadingIndicator
+import edu.dyds.movies.presentation.utils.NoResults
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

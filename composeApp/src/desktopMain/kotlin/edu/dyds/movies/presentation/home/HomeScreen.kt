@@ -29,6 +29,12 @@ import edu.dyds.movies.presentation.MoviesViewModel
 import edu.dyds.movies.presentation.utils.LoadingIndicator
 import edu.dyds.movies.presentation.utils.NoResults
 
+private val GridContentPadding = 4.dp
+private val MovieTextPadding = 8.dp
+private const val MovieImageAspectRatio = 2 / 3f
+private const val DialogImageAspectRatio = 1f
+private const val BadMovieAlpha = 0.7f
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -36,34 +42,52 @@ fun HomeScreen(
     onGoodMovieClick: (Movie) -> Unit
 ) {
 
+    val state by viewModel.moviesStateFlow.collectAsState(MoviesViewModel.MoviesUiState())
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     LaunchedEffect(Unit) {
         viewModel.getAllMovies()
     }
 
-    val state by viewModel.moviesStateFlow.collectAsState(MoviesViewModel.MoviesUiState())
-
     MaterialTheme {
         Surface {
-            val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
             Scaffold(
-                topBar = {
-                    TopAppBar(
-                        { Text(stringResource(Res.string.app_name)) },
-                        scrollBehavior = scrollBehavior
-                    )
-                },
+                topBar = { HomeTopBar(scrollBehavior) },
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
             ) { padding ->
-
-                LoadingIndicator(state.isLoading)
-
-                when {
-                    state.movies.isNotEmpty() -> MovieGrid(padding, state.movies, onGoodMovieClick)
-                    state.isLoading.not() -> NoResults { viewModel.getAllMovies() }
-                }
+                HomeScreenContent(
+                    state = state,
+                    onGoodMovieClick = onGoodMovieClick,
+                    onRetry = { viewModel.getAllMovies() },
+                    padding = padding
+                )
             }
         }
     }
+}
+
+@Composable
+private fun HomeScreenContent(
+    state: MoviesViewModel.MoviesUiState,
+    onGoodMovieClick: (Movie) -> Unit,
+    onRetry: () -> Unit,
+    padding: PaddingValues
+) {
+    LoadingIndicator(state.isLoading)
+
+    when {
+        state.movies.isNotEmpty() -> MovieGrid(padding, state.movies, onGoodMovieClick)
+        state.isLoading.not() -> NoResults(onRetry)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeTopBar(scrollBehavior: TopAppBarScrollBehavior) {
+    TopAppBar(
+        { Text(stringResource(Res.string.app_name)) },
+        scrollBehavior = scrollBehavior
+    )
 }
 
 @Composable
@@ -74,72 +98,99 @@ private fun MovieGrid(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(120.dp),
-        contentPadding = PaddingValues(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        contentPadding = PaddingValues(GridContentPadding),
+        horizontalArrangement = Arrangement.spacedBy(GridContentPadding),
+        verticalArrangement = Arrangement.spacedBy(GridContentPadding),
         modifier = Modifier.padding(padding)
     ) {
         items(movies, key = { it.movie.id }) { qualifiedMovie ->
-            when (qualifiedMovie.isGoodMovie) {
-                true -> GoodMovieItem(qualifiedMovie.movie) { onMovieClick(qualifiedMovie.movie) }
-                false -> BadMovieItem(qualifiedMovie.movie)
-            }
+            MovieGridItem(qualifiedMovie, onMovieClick)
         }
     }
 }
 
 @Composable
-private fun GoodMovieItem(movie: Movie, onClick: () -> Unit) {
-    Column(
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        AsyncImage(
-            model = movie.poster,
-            contentDescription = movie.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(2 / 3f)
-                .clip(MaterialTheme.shapes.small)
-        )
-        Text(
-            text = movie.title,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 1,
-            modifier = Modifier.padding(8.dp)
-        )
+private fun MovieGridItem(
+    qualifiedMovie: QualifiedMovie,
+    onMovieClick: (Movie) -> Unit
+) {
+    when (qualifiedMovie.isGoodMovie) {
+        true -> GoodMovieItem(qualifiedMovie.movie) { onMovieClick(qualifiedMovie.movie) }
+        false -> BadMovieItem(qualifiedMovie.movie)
     }
+}
+
+@Composable
+private fun MoviePosterImage(movie: Movie, modifier: Modifier = Modifier) {
+    AsyncImage(
+        model = movie.poster,
+        contentDescription = movie.title,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(MovieImageAspectRatio)
+            .clip(MaterialTheme.shapes.small)
+    )
+}
+
+@Composable
+private fun MovieTitle(movie: Movie) {
+    Text(
+        text = movie.title,
+        style = MaterialTheme.typography.bodySmall,
+        maxLines = 1,
+        modifier = Modifier.padding(MovieTextPadding)
+    )
+}
+
+@Composable
+private fun MovieCard(
+    movie: Movie,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
+    Column(
+        modifier = if (onClick != null) modifier.clickable { onClick() } else modifier
+    ) {
+        MoviePosterImage(movie)
+        MovieTitle(movie)
+    }
+}
+
+@Composable
+private fun GoodMovieItem(movie: Movie, onClick: () -> Unit) {
+    MovieCard(
+        movie = movie,
+        onClick = onClick
+    )
 }
 
 @Composable
 private fun BadMovieItem(movie: Movie) {
     var dialogState by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier.alpha(0.7f).clickable { dialogState = true }
-    ) {
-        AsyncImage(
-            model = movie.poster,
-            contentDescription = movie.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(2 / 3f)
-                .clip(MaterialTheme.shapes.small)
-        )
-        Text(
-            text = movie.title,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 1,
-            modifier = Modifier.padding(8.dp)
-        )
-    }
+    MovieCard(
+        movie = movie,
+        modifier = Modifier.alpha(BadMovieAlpha),
+        onClick = { dialogState = true }
+    )
 
+    BadMovieDialog(
+        visible = dialogState,
+        onCloseRequest = { }
+    )
+}
+
+@Composable
+private fun BadMovieDialog(
+    visible: Boolean,
+    onCloseRequest: () -> Unit
+) {
     DialogWindow(
         title = stringResource(Res.string.error),
         resizable = false,
-        onCloseRequest = { dialogState = false },
-        visible = dialogState
+        onCloseRequest = onCloseRequest,
+        visible = visible
     ) {
         Image(
             painter = painterResource("images/too_bad.png"),
@@ -147,7 +198,7 @@ private fun BadMovieItem(movie: Movie) {
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
+                .aspectRatio(DialogImageAspectRatio)
         )
     }
 }

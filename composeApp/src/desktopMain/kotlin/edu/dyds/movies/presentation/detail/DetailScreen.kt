@@ -30,6 +30,10 @@ import edu.dyds.movies.presentation.MoviesViewModel
 import edu.dyds.movies.presentation.utils.LoadingIndicator
 import edu.dyds.movies.presentation.utils.NoResults
 
+private val DetailContentPadding = 16.dp
+private const val DetailImageAspectRatio = 16f / 9f
+private val DetailLineHeight = 18.sp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(viewModel: MoviesViewModel, id: Int, onBack: () -> Unit) {
@@ -38,7 +42,7 @@ fun DetailScreen(viewModel: MoviesViewModel, id: Int, onBack: () -> Unit) {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(id) {
         viewModel.getMovieDetail(id)
     }
 
@@ -56,9 +60,12 @@ fun DetailScreen(viewModel: MoviesViewModel, id: Int, onBack: () -> Unit) {
 
                 LoadingIndicator(enabled = state.isLoading, modifier = Modifier.padding(padding))
 
-                when {
-                    state.movie != null -> MovieDetail(movie = state.movie!!, modifier = Modifier.padding(padding))
-                    state.isLoading.not() -> NoResults { viewModel.getMovieDetail(id) }
+                state.movie?.let { movie ->
+                    MovieDetailContent(movie = movie, modifier = Modifier.padding(padding))
+                } ?: run {
+                    if (!state.isLoading) {
+                        NoResults { viewModel.getMovieDetail(id) }
+                    }
                 }
             }
         }
@@ -66,47 +73,64 @@ fun DetailScreen(viewModel: MoviesViewModel, id: Int, onBack: () -> Unit) {
 }
 
 @Composable
-private fun MovieDetail(
+private fun MovieDetailContent(
     movie: Movie,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
-        AsyncImage(
-            model = movie.backdrop ?: movie.poster,
-            contentDescription = "",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f),
-        )
-        Text(
-            text = movie.overview,
-            modifier = Modifier.padding(16.dp),
-        )
-        Text(
-            text = buildAnnotatedString {
-                property(stringResource(Res.string.original_language), movie.originalLanguage)
-                property(stringResource(Res.string.original_title), movie.originalTitle)
-                property(stringResource(Res.string.popularity), movie.popularity.toString())
-                property(stringResource(Res.string.release_date), movie.releaseDate)
-                property(
-                    stringResource(Res.string.vote_average),
-                    movie.voteAverage.toString(),
-                    end = true
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.secondaryContainer)
-                .padding(16.dp),
-        )
+        MovieBackdrop(movie)
+        MovieOverview(movie.overview)
+        MovieDetailMetadata(movie)
     }
 }
 
-private fun AnnotatedString.Builder.property(name: String, value: String, end: Boolean = false) {
-    withStyle(ParagraphStyle(lineHeight = 18.sp)) {
+@Composable
+private fun MovieBackdrop(movie: Movie) {
+    AsyncImage(
+        model = movie.backdrop ?: movie.poster,
+        contentDescription = "",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(DetailImageAspectRatio),
+    )
+}
+
+@Composable
+private fun MovieOverview(overview: String) {
+    Text(
+        text = overview,
+        modifier = Modifier.padding(DetailContentPadding),
+    )
+}
+
+@Composable
+private fun MovieDetailMetadata(movie: Movie) {
+    val metadata = listOf(
+        stringResource(Res.string.original_language) to movie.originalLanguage,
+        stringResource(Res.string.original_title) to movie.originalTitle,
+        stringResource(Res.string.popularity) to movie.popularity.toString(),
+        stringResource(Res.string.release_date) to movie.releaseDate,
+        stringResource(Res.string.vote_average) to movie.voteAverage.toString()
+    )
+
+    Text(
+        text = buildAnnotatedString {
+            metadata.forEachIndexed { index, (name, value) ->
+                appendMovieProperty(name, value, end = index == metadata.lastIndex)
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(DetailContentPadding),
+    )
+}
+
+private fun AnnotatedString.Builder.appendMovieProperty(name: String, value: String, end: Boolean = false) {
+    withStyle(ParagraphStyle(lineHeight = DetailLineHeight)) {
         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
             append("$name: ")
         }

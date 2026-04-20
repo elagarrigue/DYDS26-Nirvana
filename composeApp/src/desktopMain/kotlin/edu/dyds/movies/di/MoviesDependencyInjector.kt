@@ -2,6 +2,9 @@ package edu.dyds.movies.di
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import edu.dyds.movies.data.MoviesRepositoryImpl
+import edu.dyds.movies.data.local.InMemoryMoviesLocalDataSource
+import edu.dyds.movies.data.remote.TmdbMoviesRemoteDataSource
 import edu.dyds.movies.presentation.MoviesViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -33,8 +36,12 @@ object MoviesDependencyInjector {
             }
         }
 
+    private val remoteDataSource = TmdbMoviesRemoteDataSource(tmdbHttpClient)
+    private val localDataSource = InMemoryMoviesLocalDataSource()
+    private val moviesRepository = MoviesRepositoryImpl.create(remoteDataSource, localDataSource)
+
     @Composable
     fun getMoviesViewModel(): MoviesViewModel {
-        return viewModel { MoviesViewModel(tmdbHttpClient) }
+        return viewModel { MoviesViewModel(moviesRepository) }
     }
 }

@@ -34,6 +34,7 @@ private val MovieTextPadding = 8.dp
 private const val MovieImageAspectRatio = 2 / 3f
 private const val DialogImageAspectRatio = 1f
 private const val BadMovieAlpha = 0.7f
+private val GridCellPadding = 120.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +98,7 @@ private fun MovieGrid(
     onMovieClick: (Movie) -> Unit
 ) {
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(120.dp),
+        columns = GridCells.Adaptive(GridCellPadding),
         contentPadding = PaddingValues(GridContentPadding),
         horizontalArrangement = Arrangement.spacedBy(GridContentPadding),
         verticalArrangement = Arrangement.spacedBy(GridContentPadding),
@@ -177,7 +178,7 @@ private fun BadMovieItem(movie: Movie) {
 
     BadMovieDialog(
         visible = dialogState,
-        onCloseRequest = { }
+        onCloseRequest = { dialogState = false }
     )
 }
 

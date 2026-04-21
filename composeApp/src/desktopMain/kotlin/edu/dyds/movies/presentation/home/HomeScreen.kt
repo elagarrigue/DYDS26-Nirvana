@@ -25,7 +25,8 @@ import dydsproject.composeapp.generated.resources.error
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
 import org.jetbrains.compose.resources.stringResource
-import edu.dyds.movies.presentation.MoviesViewModel
+import edu.dyds.movies.presentation.home.viewmodel.PopularMoviesViewModel
+import edu.dyds.movies.presentation.home.state.MoviesUiState
 import edu.dyds.movies.presentation.utils.LoadingIndicator
 import edu.dyds.movies.presentation.utils.NoResults
 
@@ -39,11 +40,11 @@ private val GridCellPadding = 120.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: MoviesViewModel,
+    viewModel: PopularMoviesViewModel,
     onGoodMovieClick: (Movie) -> Unit
 ) {
 
-    val state by viewModel.moviesStateFlow.collectAsState(MoviesViewModel.MoviesUiState())
+    val state by viewModel.moviesStateFlow.collectAsState(MoviesUiState())
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     LaunchedEffect(Unit) {
@@ -69,7 +70,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenContent(
-    state: MoviesViewModel.MoviesUiState,
+    state: MoviesUiState,
     onGoodMovieClick: (Movie) -> Unit,
     onRetry: () -> Unit,
     padding: PaddingValues

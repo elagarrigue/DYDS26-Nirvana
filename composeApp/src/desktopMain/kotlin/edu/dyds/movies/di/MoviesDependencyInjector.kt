@@ -5,7 +5,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.data.MoviesRepositoryImpl
 import edu.dyds.movies.data.local.InMemoryMoviesLocalDataSource
 import edu.dyds.movies.data.remote.TmdbMoviesRemoteDataSource
-import edu.dyds.movies.presentation.MoviesViewModel
+import edu.dyds.movies.presentation.home.viewmodel.PopularMoviesViewModel
+import edu.dyds.movies.presentation.detail.viewmodel.MovieDetailViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -41,7 +42,12 @@ object MoviesDependencyInjector {
     private val moviesRepository = MoviesRepositoryImpl.create(remoteDataSource, localDataSource)
 
     @Composable
-    fun getMoviesViewModel(): MoviesViewModel {
-        return viewModel { MoviesViewModel(moviesRepository) }
+    fun getPopularMoviesViewModel(): PopularMoviesViewModel {
+        return viewModel { PopularMoviesViewModel(moviesRepository) }
+    }
+
+    @Composable
+    fun getMovieDetailViewModel(): MovieDetailViewModel {
+        return viewModel { MovieDetailViewModel(moviesRepository) }
     }
 }

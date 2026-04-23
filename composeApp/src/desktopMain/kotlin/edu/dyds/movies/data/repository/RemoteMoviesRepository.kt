@@ -1,8 +1,6 @@
 package edu.dyds.movies.data.remote
 
 import edu.dyds.movies.data.local.MoviesLocalDataSource
-import edu.dyds.movies.data.mapper.toDomainMovie
-import edu.dyds.movies.data.mapper.toDomainMovies
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
 import edu.dyds.movies.domain.repository.MoviesRepository
@@ -17,7 +15,20 @@ class RemoteMoviesRepository(
     override suspend fun getPopularMovies(): List<QualifiedMovie> {
         return try {
             val remoteMovies = remoteDataSource.getPopularMovies().results
-            val domainMovies = remoteMovies.toDomainMovies()
+            val domainMovies = remoteMovies.map { remoteMovie ->
+                Movie(
+                    id = remoteMovie.id,
+                    title = remoteMovie.title,
+                    overview = remoteMovie.overview,
+                    releaseDate = remoteMovie.releaseDate,
+                    poster = "https://image.tmdb.org/t/p/w185${remoteMovie.posterPath}",
+                    backdrop = remoteMovie.backdropPath?.let { "https://image.tmdb.org/t/p/w780$it" },
+                    originalTitle = remoteMovie.originalTitle,
+                    originalLanguage = remoteMovie.originalLanguage,
+                    popularity = remoteMovie.popularity,
+                    voteAverage = remoteMovie.voteAverage
+                )
+            }
 
             // Save to local cache
             localDataSource.savePopularMovies(domainMovies)
@@ -48,7 +59,19 @@ class RemoteMoviesRepository(
 
     override suspend fun getMovieDetail(id: Int): Movie? {
         return try {
-            remoteDataSource.getMovieDetails(id).toDomainMovie()
+            val remoteMovie = remoteDataSource.getMovieDetails(id)
+            Movie(
+                id = remoteMovie.id,
+                title = remoteMovie.title,
+                overview = remoteMovie.overview,
+                releaseDate = remoteMovie.releaseDate,
+                poster = "https://image.tmdb.org/t/p/w185${remoteMovie.posterPath}",
+                backdrop = remoteMovie.backdropPath?.let { "https://image.tmdb.org/t/p/w780$it" },
+                originalTitle = remoteMovie.originalTitle,
+                originalLanguage = remoteMovie.originalLanguage,
+                popularity = remoteMovie.popularity,
+                voteAverage = remoteMovie.voteAverage
+            )
         } catch (e: Exception) {
             // Fallback to cached movie if remote fails
             localDataSource.getMovieDetailFromCache(id)

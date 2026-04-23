@@ -1,4 +1,4 @@
-package edu.dyds.movies.presentation.home.state
+package edu.dyds.movies.presentation.states
 
 import edu.dyds.movies.domain.entity.QualifiedMovie
 

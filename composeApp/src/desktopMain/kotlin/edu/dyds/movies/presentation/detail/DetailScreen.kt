@@ -26,8 +26,8 @@ import coil3.compose.AsyncImage
 import dydsproject.composeapp.generated.resources.*
 import edu.dyds.movies.domain.entity.Movie
 import org.jetbrains.compose.resources.stringResource
-import edu.dyds.movies.presentation.detail.viewmodel.MovieDetailViewModel
-import edu.dyds.movies.presentation.detail.state.MovieDetailUiState
+import edu.dyds.movies.domain.logicalUi.MovieDetailViewModel
+import edu.dyds.movies.presentation.states.MovieDetailUiState
 import edu.dyds.movies.presentation.utils.LoadingIndicator
 import edu.dyds.movies.presentation.utils.NoResults
 

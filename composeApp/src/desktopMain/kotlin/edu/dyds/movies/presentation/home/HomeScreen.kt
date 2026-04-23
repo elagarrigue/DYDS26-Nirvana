@@ -25,8 +25,8 @@ import dydsproject.composeapp.generated.resources.error
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
 import org.jetbrains.compose.resources.stringResource
-import edu.dyds.movies.presentation.home.viewmodel.PopularMoviesViewModel
-import edu.dyds.movies.presentation.home.state.MoviesUiState
+import edu.dyds.movies.presentation.states.MoviesUiState
+import edu.dyds.movies.domain.logicalUi.PopularMoviesViewModel
 import edu.dyds.movies.presentation.utils.LoadingIndicator
 import edu.dyds.movies.presentation.utils.NoResults
 

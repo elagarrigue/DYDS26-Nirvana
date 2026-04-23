@@ -5,8 +5,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.data.MoviesRepositoryImpl
 import edu.dyds.movies.data.local.InMemoryMoviesLocalDataSource
 import edu.dyds.movies.data.remote.TmdbMoviesRemoteDataSource
-import edu.dyds.movies.presentation.home.viewmodel.PopularMoviesViewModel
-import edu.dyds.movies.presentation.detail.viewmodel.MovieDetailViewModel
+import edu.dyds.movies.domain.logicalUi.PopularMoviesViewModel
+import edu.dyds.movies.domain.logicalUi.MovieDetailViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*

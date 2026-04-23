@@ -2,11 +2,12 @@ package edu.dyds.movies.di
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import edu.dyds.movies.data.MoviesRepositoryImpl
+import edu.dyds.movies.data.repository.MoviesRepositoryImpl
 import edu.dyds.movies.data.local.InMemoryMoviesLocalDataSource
 import edu.dyds.movies.data.remote.TmdbMoviesRemoteDataSource
-import edu.dyds.movies.domain.logicalUi.PopularMoviesViewModel
-import edu.dyds.movies.domain.logicalUi.MovieDetailViewModel
+import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
+import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
+import edu.dyds.movies.presentation.MoviesViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -41,13 +42,11 @@ object MoviesDependencyInjector {
     private val localDataSource = InMemoryMoviesLocalDataSource()
     private val moviesRepository = MoviesRepositoryImpl.create(remoteDataSource, localDataSource)
 
-    @Composable
-    fun getPopularMoviesViewModel(): PopularMoviesViewModel {
-        return viewModel { PopularMoviesViewModel(moviesRepository) }
-    }
+    private val getMovieDetailsUseCase = GetMovieDetailsUseCase(moviesRepository)
+    private val getPopularMoviesUseCase = GetPopularMoviesUseCase(moviesRepository)
 
     @Composable
-    fun getMovieDetailViewModel(): MovieDetailViewModel {
-        return viewModel { MovieDetailViewModel(moviesRepository) }
+    fun getMoviesViewModel(): MoviesViewModel {
+        return viewModel { MoviesViewModel(getMovieDetailsUseCase, getPopularMoviesUseCase) }
     }
 }

@@ -1,17 +1,17 @@
 package edu.dyds.movies.data.repository
 
-import edu.dyds.movies.data.local.InMemoryMoviesLocalDataSource
-import edu.dyds.movies.data.mapper.MovieMapper
-import edu.dyds.movies.data.qualifier.MovieQualifier
-import edu.dyds.movies.data.remote.TmdbMoviesRemoteDataSource
+import edu.dyds.movies.data.local.InterfaceInMemoryMoviesLocalDataSource
+import edu.dyds.movies.data.remote.InterfaceTmdbMoviesRemoteDataSource
+import edu.dyds.movies.domain.mapper.MovieMapper
+import edu.dyds.movies.domain.qualifier.MovieQualifier
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
 import edu.dyds.movies.domain.repository.MoviesRepository
 import java.io.IOException
 
 class MoviesRepositoryImpl(
-    private val remoteDataSource: TmdbMoviesRemoteDataSource,
-    private val localDataSource: InMemoryMoviesLocalDataSource,
+    private val remoteDataSource: InterfaceTmdbMoviesRemoteDataSource,
+    private val localDataSource: InterfaceInMemoryMoviesLocalDataSource,
     private val movieMapper: MovieMapper = MovieMapper(),
     private val movieQualifier: MovieQualifier = MovieQualifier
 ) : MoviesRepository {

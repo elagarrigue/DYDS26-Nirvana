@@ -1,4 +1,4 @@
-package edu.dyds.movies.data.qualifier
+package edu.dyds.movies.domain.qualifier
 
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie

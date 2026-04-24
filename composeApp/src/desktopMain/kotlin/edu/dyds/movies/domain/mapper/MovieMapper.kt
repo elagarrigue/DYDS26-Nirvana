@@ -1,4 +1,4 @@
-package edu.dyds.movies.data.mapper
+package edu.dyds.movies.domain.mapper
 
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.RemoteMovie

@@ -1,4 +1,4 @@
-package edu.dyds.movies.presentation.detail
+package edu.dyds.movies.presentation.view.detail
 
 import edu.dyds.movies.domain.entity.Movie
 

@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package edu.dyds.movies.presentation.home
+package edu.dyds.movies.presentation.view.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,7 +25,7 @@ import dydsproject.composeapp.generated.resources.error
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
 import org.jetbrains.compose.resources.stringResource
-import edu.dyds.movies.presentation.homeviewmodel.HomeViewModel
+import edu.dyds.movies.presentation.viewmodel.homeviewmodel.HomeViewModel
 import edu.dyds.movies.presentation.utils.LoadingIndicator
 import edu.dyds.movies.presentation.utils.NoResults
 

@@ -1,9 +1,9 @@
-package edu.dyds.movies.presentation.homeviewmodel
+package edu.dyds.movies.presentation.viewmodel.homeviewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.dyds.movies.domain.usecase.MoviesUseCases
-import edu.dyds.movies.presentation.home.MoviesUiState
+import edu.dyds.movies.presentation.view.home.MoviesUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

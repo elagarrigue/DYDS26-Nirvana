@@ -1,26 +1,19 @@
-package edu.dyds.movies.presentation
+package edu.dyds.movies.presentation.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
-import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
-import edu.dyds.movies.presentation.states.MovieDetailUiState
-import edu.dyds.movies.presentation.states.MoviesUiState
+import edu.dyds.movies.presentation.detail.MovieDetailUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class MoviesViewModel(
+class DetailViewModel(
     private val getMovieDetailsUseCase: GetMovieDetailsUseCase,
-    private val getPopularMoviesUseCase: GetPopularMoviesUseCase
 ) : ViewModel() {
 
     private val movieDetailStateMutableStateFlow = MutableStateFlow(MovieDetailUiState())
     val movieDetailStateFlow: Flow<MovieDetailUiState> = movieDetailStateMutableStateFlow
-
-    private val moviesStateMutableStateFlow = MutableStateFlow(MoviesUiState())
-    val moviesStateFlow: Flow<MoviesUiState> = moviesStateMutableStateFlow
-
     fun getMovieDetail(id: Int) {
         viewModelScope.launch {
             movieDetailStateMutableStateFlow.emit(
@@ -35,20 +28,4 @@ class MoviesViewModel(
             )
         }
     }
-
-    fun getAllMovies() {
-        viewModelScope.launch {
-            moviesStateMutableStateFlow.emit(
-                MoviesUiState(isLoading = true)
-            )
-            val movies = getPopularMoviesUseCase()
-            moviesStateMutableStateFlow.emit(
-                MoviesUiState(
-                    isLoading = false,
-                    movies = movies
-                )
-            )
-        }
-    }
 }
-

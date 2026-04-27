@@ -1,6 +1,7 @@
 package edu.dyds.movies.di
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.domain.mapper.MovieMapper
 import edu.dyds.movies.domain.qualifier.MovieQualifier
@@ -9,7 +10,8 @@ import edu.dyds.movies.data.local.InMemoryMoviesLocalDataSource
 import edu.dyds.movies.data.remote.TmdbMoviesRemoteDataSource
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
 import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
-import edu.dyds.movies.presentation.MoviesViewModel
+import edu.dyds.movies.presentation.viewModel.DetailViewModel
+import edu.dyds.movies.presentation.viewModel.HomeViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -53,12 +55,16 @@ object MoviesDependencyInjector {
         movieQualifier
     )
 
-    // Capa de dominio
     private val getMovieDetailsUseCase = GetMovieDetailsUseCase(moviesRepository)
     private val getPopularMoviesUseCase = GetPopularMoviesUseCase(moviesRepository)
 
     @Composable
-    fun getMoviesViewModel(): MoviesViewModel {
-        return viewModel { MoviesViewModel(getMovieDetailsUseCase, getPopularMoviesUseCase) }
+    fun getDetailViewModel(): DetailViewModel {
+        return viewModel { DetailViewModel(getMovieDetailsUseCase) }
+    }
+
+    @Composable
+    fun getHomeViewModel() : HomeViewModel {
+        return viewModel { HomeViewModel(getPopularMoviesUseCase) }
     }
 }

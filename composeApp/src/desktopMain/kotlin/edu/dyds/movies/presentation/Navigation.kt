@@ -13,6 +13,9 @@ import androidx.navigation.navArgument
 import edu.dyds.movies.di.MoviesDependencyInjector
 import edu.dyds.movies.presentation.detail.DetailScreen
 import edu.dyds.movies.presentation.home.HomeScreen
+import edu.dyds.movies.presentation.viewModel.DetailViewModel
+import edu.dyds.movies.presentation.viewModel.HomeViewModel
+
 private const val HOME = "home"
 
 private const val DETAIL = "detail"
@@ -22,15 +25,16 @@ private const val MOVIE_ID = "movieId"
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
-    val moviesViewModel = MoviesDependencyInjector.getMoviesViewModel()
+    val detailViewModel = MoviesDependencyInjector.getDetailViewModel()
+    val homeViewModel = MoviesDependencyInjector.getHomeViewModel()
 
     NavHost(navController = navController, startDestination = HOME) {
-        homeDestination(navController, moviesViewModel)
-        detailDestination(navController, moviesViewModel)
+        homeDestination(navController, homeViewModel)
+        detailDestination(navController, detailViewModel)
     }
 }
 
-private fun NavGraphBuilder.homeDestination(navController: NavHostController, moviesViewModel: MoviesViewModel) {
+private fun NavGraphBuilder.homeDestination(navController: NavHostController, moviesViewModel: HomeViewModel) {
     composable(HOME) {
         HomeScreen(
             viewModel = moviesViewModel,
@@ -41,7 +45,7 @@ private fun NavGraphBuilder.homeDestination(navController: NavHostController, mo
     }
 }
 
-private fun NavGraphBuilder.detailDestination(navController: NavHostController, moviesViewModel: MoviesViewModel) {
+private fun NavGraphBuilder.detailDestination(navController: NavHostController, moviesViewModel: DetailViewModel) {
     composable(
         route = "$DETAIL/{$MOVIE_ID}",
         arguments = listOf(navArgument(MOVIE_ID) { type = NavType.IntType })

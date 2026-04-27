@@ -10,8 +10,8 @@ import edu.dyds.movies.data.local.InMemoryMoviesLocalDataSource
 import edu.dyds.movies.data.remote.TmdbMoviesRemoteDataSource
 import edu.dyds.movies.domain.usecase.MoviesUseCases
 import edu.dyds.movies.domain.usecase.MoviesUseCasesImpl
-import edu.dyds.movies.presentation.viewModel.DetailViewModel
-import edu.dyds.movies.presentation.viewModel.HomeViewModel
+import edu.dyds.movies.presentation.detailsviewmodel.DetailViewModel
+import edu.dyds.movies.presentation.homeviewmodel.HomeViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*

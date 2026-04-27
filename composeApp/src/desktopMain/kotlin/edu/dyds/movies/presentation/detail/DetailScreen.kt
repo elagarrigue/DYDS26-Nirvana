@@ -26,8 +26,7 @@ import coil3.compose.AsyncImage
 import dydsproject.composeapp.generated.resources.*
 import edu.dyds.movies.domain.entity.Movie
 import org.jetbrains.compose.resources.stringResource
-import edu.dyds.movies.presentation.viewModel.DetailViewModel
-import edu.dyds.movies.presentation.detail.MovieDetailUiState
+import edu.dyds.movies.presentation.detailsviewmodel.DetailViewModel
 import edu.dyds.movies.presentation.utils.LoadingIndicator
 import edu.dyds.movies.presentation.utils.NoResults
 
@@ -38,6 +37,7 @@ private val DetailLineHeight = 18.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(viewModel: DetailViewModel, id: Int, onBack: () -> Unit) {
+
     val state by viewModel.movieDetailStateFlow.collectAsState(MovieDetailUiState())
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()

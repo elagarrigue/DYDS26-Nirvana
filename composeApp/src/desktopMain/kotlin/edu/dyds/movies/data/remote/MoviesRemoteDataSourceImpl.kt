@@ -6,9 +6,9 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 
-class TmdbMoviesRemoteDataSource(
+class MoviesRemoteDataSourceImpl(
     private val httpClient: HttpClient
-) : InterfaceTmdbMoviesRemoteDataSource {
+) : MoviesRemoteDataSource {
     override suspend fun getPopularMovies(): RemoteResult =
         httpClient.get("/3/discover/movie?sort_by=popularity.desc").body()
 

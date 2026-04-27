@@ -5,8 +5,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.domain.mapper.MovieMapper
 import edu.dyds.movies.domain.qualifier.MovieQualifier
 import edu.dyds.movies.data.repository.MoviesRepositoryImpl
-import edu.dyds.movies.data.local.InMemoryMoviesLocalDataSource
-import edu.dyds.movies.data.remote.TmdbMoviesRemoteDataSource
+import edu.dyds.movies.data.local.MoviesLocalDataSourceImpl
+import edu.dyds.movies.data.remote.MoviesRemoteDataSourceImpl
 import edu.dyds.movies.domain.usecase.MoviesUseCases
 import edu.dyds.movies.domain.usecase.MoviesUseCasesImpl
 import edu.dyds.movies.presentation.viewmodel.detailsviewmodel.DetailViewModel
@@ -42,8 +42,8 @@ object MoviesDependencyInjector {
         }
 
     // Capa de datos
-    private val remoteDataSource = TmdbMoviesRemoteDataSource(tmdbHttpClient)
-    private val localDataSource = InMemoryMoviesLocalDataSource()
+    private val remoteDataSource = MoviesRemoteDataSourceImpl(tmdbHttpClient)
+    private val localDataSource = MoviesLocalDataSourceImpl()
     private val movieMapper = MovieMapper()
     private val movieQualifier = MovieQualifier
 

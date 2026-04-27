@@ -2,7 +2,7 @@ package edu.dyds.movies.data.local
 
 import edu.dyds.movies.domain.entity.Movie
 
-class InMemoryMoviesLocalDataSource : InterfaceInMemoryMoviesLocalDataSource {
+class MoviesLocalDataSourceImpl : MoviesLocalDataSource {
     private val movieCache: MutableList<Movie> = mutableListOf()
 
     override suspend fun savePopularMovies(movies: List<Movie>) {

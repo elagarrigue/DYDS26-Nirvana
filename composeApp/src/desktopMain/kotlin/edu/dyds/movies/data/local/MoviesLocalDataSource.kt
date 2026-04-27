@@ -2,7 +2,7 @@ package edu.dyds.movies.data.local
 
 import edu.dyds.movies.domain.entity.Movie
 
-interface InterfaceInMemoryMoviesLocalDataSource {
+interface MoviesLocalDataSource {
     suspend fun savePopularMovies(movies: List<Movie>)
 
     suspend fun getPopularMoviesFromCache(): List<Movie>

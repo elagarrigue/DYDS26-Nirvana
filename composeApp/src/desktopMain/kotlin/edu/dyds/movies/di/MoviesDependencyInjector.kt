@@ -1,7 +1,6 @@
 package edu.dyds.movies.di
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.domain.mapper.MovieMapper
 import edu.dyds.movies.domain.qualifier.MovieQualifier
@@ -10,8 +9,8 @@ import edu.dyds.movies.data.local.InMemoryMoviesLocalDataSource
 import edu.dyds.movies.data.remote.TmdbMoviesRemoteDataSource
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
 import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
-import edu.dyds.movies.presentation.viewModel.DetailViewModel
-import edu.dyds.movies.presentation.viewModel.HomeViewModel
+import edu.dyds.movies.presentation.detailsviewmodel.DetailViewModel
+import edu.dyds.movies.presentation.homeviewmodel.HomeViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*

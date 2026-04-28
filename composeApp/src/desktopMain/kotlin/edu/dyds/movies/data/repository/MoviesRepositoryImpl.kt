@@ -12,31 +12,18 @@ import java.io.IOException
 class MoviesRepositoryImpl(
     private val remoteDataSource: MoviesRemoteDataSource,
     private val localDataSource: MoviesLocalDataSource,
-    private val movieMapper: MovieMapper = MovieMapper(),
-    private val movieQualifier: MovieQualifier = MovieQualifier
+    private val movieMapper: MovieMapper = MovieMapper()
 ) : MoviesRepository {
 
-    override suspend fun getPopularMovies(): List<QualifiedMovie> {
-        return try {
-            fetchPopularMoviesFromRemote()
-        } catch (e: IOException) {
-            fetchPopularMoviesFromCache()
-        }
-    }
+    override suspend fun getPopularMovies(): List<Movie> {
+        val cached = localDataSource.getPopularMoviesFromCache()
+        if (cached.isNotEmpty()) return cached
 
-    private suspend fun fetchPopularMoviesFromRemote(): List<QualifiedMovie> {
         val remoteMovies = remoteDataSource.getPopularMovies().results
         val domainMovies = remoteMovies.map(movieMapper::toDomainMovie)
 
         localDataSource.savePopularMovies(domainMovies)
-
-        return movieQualifier.buildQualifiedMovies(remoteMovies, domainMovies)
-    }
-
-    private suspend fun fetchPopularMoviesFromCache(): List<QualifiedMovie> {
-        return localDataSource
-            .getPopularMoviesFromCache()
-            .map(movieQualifier::qualifyMovie)
+        return domainMovies
     }
 
     override suspend fun getMovieDetail(id: Int): Movie? {

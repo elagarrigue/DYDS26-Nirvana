@@ -45,16 +45,15 @@ object MoviesDependencyInjector {
     private val remoteDataSource = MoviesRemoteDataSourceImpl(tmdbHttpClient)
     private val localDataSource = MoviesLocalDataSourceImpl()
     private val movieMapper = MovieMapper()
-    private val movieQualifier = MovieQualifier
+    private val movieQualifier = MovieQualifier()
 
     private val moviesRepository = MoviesRepositoryImpl(
         remoteDataSource,
         localDataSource,
-        movieMapper,
-        movieQualifier
+        movieMapper
     )
 
-    private val moviesUseCases: MoviesUseCases = MoviesUseCasesImpl(moviesRepository)
+    private val moviesUseCases: MoviesUseCases = MoviesUseCasesImpl(moviesRepository, movieQualifier)
 
     @Composable
     fun getDetailViewModel(): DetailViewModel {

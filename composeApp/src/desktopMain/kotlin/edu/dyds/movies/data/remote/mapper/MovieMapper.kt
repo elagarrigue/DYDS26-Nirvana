@@ -1,7 +1,7 @@
-package edu.dyds.movies.domain.mapper
+package edu.dyds.movies.data.remote.mapper
 
+import edu.dyds.movies.data.remote.RemoteMovie
 import edu.dyds.movies.domain.entity.Movie
-import edu.dyds.movies.domain.entity.RemoteMovie
 
 private const val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185"
 private const val BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780"

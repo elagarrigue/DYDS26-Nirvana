@@ -2,7 +2,7 @@ package edu.dyds.movies.di
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import edu.dyds.movies.domain.mapper.MovieMapper
+import edu.dyds.movies.data.remote.mapper.MovieMapper
 import edu.dyds.movies.domain.qualifier.MovieQualifier
 import edu.dyds.movies.data.repository.MoviesRepositoryImpl
 import edu.dyds.movies.data.local.MoviesLocalDataSourceImpl
@@ -40,8 +40,6 @@ object MoviesDependencyInjector {
                 requestTimeoutMillis = 5000
             }
         }
-
-    // Capa de datos
     private val remoteDataSource = MoviesRemoteDataSourceImpl(tmdbHttpClient)
     private val localDataSource = MoviesLocalDataSourceImpl()
     private val movieMapper = MovieMapper()

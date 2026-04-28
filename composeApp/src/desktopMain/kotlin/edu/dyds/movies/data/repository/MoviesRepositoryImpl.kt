@@ -2,10 +2,8 @@ package edu.dyds.movies.data.repository
 
 import edu.dyds.movies.data.local.MoviesLocalDataSource
 import edu.dyds.movies.data.remote.MoviesRemoteDataSource
-import edu.dyds.movies.domain.mapper.MovieMapper
-import edu.dyds.movies.domain.qualifier.MovieQualifier
+import edu.dyds.movies.data.remote.mapper.MovieMapper
 import edu.dyds.movies.domain.entity.Movie
-import edu.dyds.movies.domain.entity.QualifiedMovie
 import edu.dyds.movies.domain.repository.MoviesRepository
 import java.io.IOException
 

@@ -7,8 +7,10 @@ import edu.dyds.movies.domain.qualifier.MovieQualifier
 import edu.dyds.movies.data.repository.MoviesRepositoryImpl
 import edu.dyds.movies.data.local.MoviesLocalDataSourceImpl
 import edu.dyds.movies.data.remote.MoviesRemoteDataSourceImpl
-import edu.dyds.movies.domain.usecase.MoviesUseCases
-import edu.dyds.movies.domain.usecase.MoviesUseCasesImpl
+import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
+import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCaseImpl
+import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
+import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCaseImpl
 import edu.dyds.movies.presentation.viewmodel.detailsviewmodel.DetailViewModel
 import edu.dyds.movies.presentation.viewmodel.homeviewmodel.HomeViewModel
 import io.ktor.client.*
@@ -51,15 +53,16 @@ object MoviesDependencyInjector {
         movieMapper
     )
 
-    private val moviesUseCases: MoviesUseCases = MoviesUseCasesImpl(moviesRepository, movieQualifier)
+    private val getMovieDetailsUseCase: GetMovieDetailsUseCase = GetMovieDetailsUseCaseImpl(moviesRepository)
+    private val getPopularMoviesUseCase: GetPopularMoviesUseCase = GetPopularMoviesUseCaseImpl(moviesRepository, movieQualifier)
 
     @Composable
     fun getDetailViewModel(): DetailViewModel {
-        return viewModel { DetailViewModel(moviesUseCases) }
+        return viewModel { DetailViewModel(getMovieDetailsUseCase) }
     }
 
     @Composable
     fun getHomeViewModel() : HomeViewModel {
-        return viewModel { HomeViewModel(moviesUseCases) }
+        return viewModel { HomeViewModel(getPopularMoviesUseCase) }
     }
 }

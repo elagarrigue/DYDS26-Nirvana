@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package edu.dyds.movies.presentation.view.detail
+package edu.dyds.movies.presentation.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

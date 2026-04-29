@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package edu.dyds.movies.presentation.view.home
+package edu.dyds.movies.presentation.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

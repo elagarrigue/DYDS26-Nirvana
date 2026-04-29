@@ -11,8 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import edu.dyds.movies.di.MoviesDependencyInjector
-import edu.dyds.movies.presentation.view.detail.DetailScreen
-import edu.dyds.movies.presentation.view.home.HomeScreen
+import edu.dyds.movies.presentation.detail.DetailScreen
+import edu.dyds.movies.presentation.home.HomeScreen
 import edu.dyds.movies.presentation.viewmodel.detailsviewmodel.DetailViewModel
 import edu.dyds.movies.presentation.viewmodel.homeviewmodel.HomeViewModel
 

@@ -11,7 +11,7 @@ class MovieQualifier {
             .sortedByDescending { it.voteAverage }
             .map { qualifyMovie(it) }
 
-    fun qualifyMovie(movie: Movie): QualifiedMovie =
+    private fun qualifyMovie(movie: Movie): QualifiedMovie =
         QualifiedMovie(
             movie = movie,
             isGoodMovie = qualifies(movie.voteAverage)

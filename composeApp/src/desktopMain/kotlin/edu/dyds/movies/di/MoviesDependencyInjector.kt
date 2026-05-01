@@ -11,8 +11,8 @@ import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCaseImpl
 import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
 import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCaseImpl
-import edu.dyds.movies.presentation.viewmodel.detailsviewmodel.DetailViewModel
-import edu.dyds.movies.presentation.viewmodel.homeviewmodel.HomeViewModel
+import edu.dyds.movies.presentation.detail.DetailViewModel
+import edu.dyds.movies.presentation.home.HomeViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*

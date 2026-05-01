@@ -17,5 +17,3 @@ data class Movie(
 )
 
 data class QualifiedMovie(val movie: Movie, val isGoodMovie: Boolean)
-
-

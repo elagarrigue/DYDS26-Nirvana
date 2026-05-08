@@ -1,7 +1,6 @@
-package movies.data.local
+package edu.dyds.movies.data.local
 
-import edu.dyds.movies.data.local.MoviesLocalDataSourceImpl
-import edu.dyds.movies.utils.fakeMovie
+import edu.dyds.movies.commonFakes.fakeMovie
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

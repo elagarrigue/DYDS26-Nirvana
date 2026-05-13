@@ -1,11 +1,9 @@
 package edu.dyds.movies.domain.usecase
 
-import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
 import edu.dyds.movies.domain.qualifier.MovieQualifier
-import edu.dyds.movies.domain.repository.MoviesRepository
-import edu.dyds.movies.commonFakes.fakeMovie
 import edu.dyds.movies.commonFakes.FakeMoviesRepository
+import edu.dyds.movies.domain.entity.Movie
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -14,6 +12,18 @@ import org.junit.Test
 
 class UseCaseTests {
 
+    private val default = Movie(
+        id = 1,
+        title = "Fake Movie",
+        overview = "A fake overview",
+        releaseDate = "2025-10-31",
+        poster = "/fake_poster.jpg",
+        backdrop = "/fake_backdrop.jpg",
+        originalTitle = "Fake Movie Original",
+        originalLanguage = "en",
+        popularity = 7.5,
+        voteAverage = 8.0
+    )
     private lateinit var repository: FakeMoviesRepository
     private lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
     private lateinit var getPopularMoviesUseCase: GetPopularMoviesUseCase
@@ -27,12 +37,11 @@ class UseCaseTests {
 
     @Test
     fun `getMovieDetails devuelve la pelicula del repositorio`() = runTest {
-        val movie = fakeMovie(id = 10, title = "The Matrix")
-        repository.movieDetail = movie
+        repository.movieDetail = default
 
         val result = getMovieDetailsUseCase.getMovieDetails(10)
 
-        assertEquals(movie, result)
+        assertEquals(default, result)
     }
 
     @Test
@@ -55,9 +64,9 @@ class UseCaseTests {
 
     @Test
     fun `GetPopularMovies devuelve peliculas calificadas y ordenadas por voteAverage`() = runTest {
-        val badMovie = fakeMovie(id = 1, title = "Bad Movie", voteAverage = 5.9)
-        val bestMovie = fakeMovie(id = 2, title = "Best Movie", voteAverage = 9.0)
-        val goodMovie = fakeMovie(id = 3, title = "Good Movie", voteAverage = 6.0)
+        val badMovie = default.copy(id = 1, title = "Bad Movie", voteAverage = 5.9)
+        val bestMovie = default.copy(id = 2, title = "Best Movie", voteAverage = 9.0)
+        val goodMovie = default.copy(id = 3, title = "Good Movie", voteAverage = 6.0)
         repository.popularMovies = listOf(badMovie, bestMovie, goodMovie)
 
         val result = getPopularMoviesUseCase.GetPopularMovies()

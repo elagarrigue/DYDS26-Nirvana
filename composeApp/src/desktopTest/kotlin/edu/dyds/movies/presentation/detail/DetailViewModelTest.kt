@@ -1,7 +1,7 @@
 package edu.dyds.movies.presentation.detail
 
 import edu.dyds.movies.commonFakes.FakeGetMovieDetailsUseCase
-import edu.dyds.movies.commonFakes.fakeMovie
+import edu.dyds.movies.domain.entity.Movie
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -13,6 +13,18 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailViewModelTest {
 
+    private val default = Movie(
+        id = 1,
+        title = "Fake Movie",
+        overview = "A fake overview",
+        releaseDate = "2025-10-31",
+        poster = "/fake_poster.jpg",
+        backdrop = "/fake_backdrop.jpg",
+        originalTitle = "Fake Movie Original",
+        originalLanguage = "en",
+        popularity = 7.5,
+        voteAverage = 8.0
+    )
     private lateinit var fakeUseCase: FakeGetMovieDetailsUseCase
     private lateinit var viewModel: DetailViewModel
 
@@ -24,13 +36,12 @@ class DetailViewModelTest {
 
     @Test
     fun `emits loading then movie when movie is found`() = runTest {
-        val movie = fakeMovie(id = 1, title = "Test Movie")
-        fakeUseCase.movieToReturn = movie
+        fakeUseCase.movieToReturn = default
 
         viewModel.getMovieDetail(1)
 
         val state = viewModel.movieDetailStateFlow.first { !it.isLoading }
-        assertEquals(movie, state.movie)
+        assertEquals(default, state.movie)
         assertEquals(false, state.isLoading)
     }
 

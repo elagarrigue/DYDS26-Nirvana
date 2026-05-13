@@ -1,6 +1,6 @@
 package edu.dyds.movies.data.local
 
-import edu.dyds.movies.commonFakes.FakeMovie
+import edu.dyds.movies.domain.entity.Movie
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -9,6 +9,19 @@ import org.junit.Before
 import org.junit.Test
 
 class MoviesLocalDataTest {
+
+    private val default = Movie(
+        id = 1,
+        title = "Fake Movie",
+        overview = "A fake overview",
+        releaseDate = "2025-10-31",
+        poster = "/fake_poster.jpg",
+        backdrop = "/fake_backdrop.jpg",
+        originalTitle = "Fake Movie Original",
+        originalLanguage = "en",
+        popularity = 7.5,
+        voteAverage = 8.0
+    )
 
     private lateinit var localDataSource: MoviesLocalDataSourceImpl
 
@@ -22,7 +35,7 @@ class MoviesLocalDataTest {
     }
     @Test
     fun `guardado de peliculas en cache`() = runTest {
-        val movies = listOf(FakeMovie.default.copy(id = 1), FakeMovie.default.copy(id = 2))
+        val movies = listOf(default.copy(id = 1), default.copy(id = 2))
 
         localDataSource.savePopularMovies(movies)
 
@@ -31,16 +44,16 @@ class MoviesLocalDataTest {
 
     @Test
     fun `guardar nuevas peliculas reemplaza el cache anterior`() = runTest {
-        localDataSource.savePopularMovies(listOf(FakeMovie.default.copy(id = 1), FakeMovie.default.copy(id = 2)))
-        val secondBatch = listOf(FakeMovie.default.copy(id = 3), FakeMovie.default.copy(id = 4))
+        localDataSource.savePopularMovies(listOf(default.copy(id = 1), default.copy(id = 2)))
+        val secondBatch = listOf(default.copy(id = 3), default.copy(id = 4))
 
         localDataSource.savePopularMovies(secondBatch)
 
         assertEquals(secondBatch, localDataSource.getPopularMoviesFromCache())
     }
     @Test
-    fun `guardar una lista vacia en cache   `() = runTest {
-        localDataSource.savePopularMovies(listOf(FakeMovie.default.copy(id = 1)))
+    fun `guardar una lista vacia en cache`() = runTest {
+        localDataSource.savePopularMovies(listOf(default.copy(id = 1)))
 
         localDataSource.savePopularMovies(emptyList())
 
@@ -48,8 +61,8 @@ class MoviesLocalDataTest {
     }
     @Test
     fun `buscar pelicula por id`() = runTest {
-        val targetMovie = FakeMovie.default.copy(id = 42, title = "Inception")
-        localDataSource.savePopularMovies(listOf(FakeMovie.default.copy(id = 1), targetMovie, FakeMovie.default.copy(id = 3)))
+        val targetMovie = default.copy(id = 42, title = "Inception")
+        localDataSource.savePopularMovies(listOf(default.copy(id = 1), targetMovie, default.copy(id = 3)))
 
         val result = localDataSource.getMovieDetailFromCache(42)
 
@@ -57,7 +70,7 @@ class MoviesLocalDataTest {
     }
     @Test
     fun `busqueda de id inexistente`() = runTest {
-        localDataSource.savePopularMovies(listOf(FakeMovie.default.copy(id = 1), FakeMovie.default.copy(id = 2)))
+        localDataSource.savePopularMovies(listOf(default.copy(id = 1), default.copy(id = 2)))
 
         val result = localDataSource.getMovieDetailFromCache(99)
 

@@ -24,7 +24,7 @@ class MoviesRepositoryImplTest {
     }
 
     @Test
-    fun `returns cached movies if available`() = runBlocking {
+    fun `Devuelve las películas en caché si están disponibles`() = runBlocking {
         val cachedMovies = listOf(Movie(1, "title", "overview", "2020-01-01", "poster", null, "originalTitle", "en", 1.0, 8.0))
         localDataSource.cachedMovies = cachedMovies
         val result = repository.getPopularMovies()
@@ -32,7 +32,7 @@ class MoviesRepositoryImplTest {
     }
 
     @Test
-    fun `fetches from remote and caches if cache is empty`() = runBlocking {
+    fun `Realiza búsquedas desde el servidor remoto y almacena en caché, si la caché está vacía`() = runBlocking {
         localDataSource.cachedMovies = emptyList()
         val remoteMovie = RemoteMovie(1, "title", "overview", "2020-01-01", "/poster.jpg", null, "originalTitle", "en", 1.0, 8.0)
         remoteDataSource.remoteResult = RemoteResult(
@@ -49,7 +49,7 @@ class MoviesRepositoryImplTest {
     }
 
     @Test
-    fun `returns movie detail from remote if available`() = runBlocking {
+    fun `Devuelve los detalles de la película desde remote si están disponibles`() = runBlocking {
         val remoteMovie = RemoteMovie(2, "title2", "overview2", "2020-02-02", "/poster2.jpg", null, "originalTitle2", "es", 2.0, 7.0)
         remoteDataSource.remoteMovie = remoteMovie
         val result = repository.getMovieDetail(2)
@@ -58,7 +58,7 @@ class MoviesRepositoryImplTest {
     }
 
     @Test
-    fun `falls back to local cache on remote error`() = runBlocking {
+    fun `En caso de error remoto, se recurre a la caché local`() = runBlocking {
         remoteDataSource.shouldThrow = true
         val cachedMovie = Movie(3, "title3", "overview3", "2020-03-03", "poster3", null, "originalTitle3", "fr", 3.0, 6.0)
         localDataSource.cachedMovieDetail = cachedMovie

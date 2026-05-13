@@ -35,7 +35,7 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `emits loading then movie when movie is found`() = runTest {
+    fun `emite carga y luego película cuando se encuentra la película`() = runTest {
         fakeUseCase.movieToReturn = default
 
         viewModel.getMovieDetail(1)
@@ -46,7 +46,7 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `emits loading then null when movie is not found`() = runTest {
+    fun `Emite carga y luego null cuando no se encuentra la película`() = runTest {
         fakeUseCase.movieToReturn = null
 
         viewModel.getMovieDetail(99)

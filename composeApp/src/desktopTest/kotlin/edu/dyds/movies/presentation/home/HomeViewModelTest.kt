@@ -44,7 +44,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `emits loading then movies when movies are found`() = runTest {
+    fun `emite carga y luego películas cuando se encuentran películas`() = runTest {
         val movies = listOf(
             defaultGoodMovie,
             defaultBadMovie
@@ -59,7 +59,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `emits loading then empty list when no movies are found`() = runTest {
+    fun `Emite un mensaje de carga y luego una lista vacía cuando no se encuentran películas`() = runTest {
         fakeUseCase.moviesToReturn = emptyList()
 
         viewModel.getAllMovies()

@@ -24,7 +24,7 @@ class MoviesRepositoryImplTest {
     }
 
     @Test
-    fun `Devuelve las películas en caché si están disponibles`() = runBlocking {
+    fun `teniendo películas en cache, al llamar a getPopularMovies, se devuelven las películas en cache sin consultar remoto`() = runBlocking {
         val cachedMovies = listOf(Movie(1, "title", "overview", "2020-01-01", "poster", null, "originalTitle", "en", 1.0, 8.0))
         localDataSource.cachedMovies = cachedMovies
         val result = repository.getPopularMovies()
@@ -32,7 +32,7 @@ class MoviesRepositoryImplTest {
     }
 
     @Test
-    fun `Realiza búsquedas desde el servidor remoto y almacena en caché, si la caché está vacía`() = runBlocking {
+    fun `realiza búsquedas desde el servidor remoto y almacena en caché, si la caché está vacía`() = runBlocking {
         localDataSource.cachedMovies = emptyList()
         val remoteMovie = RemoteMovie(1, "title", "overview", "2020-01-01", "/poster.jpg", null, "originalTitle", "en", 1.0, 8.0)
         remoteDataSource.remoteResult = RemoteResult(
@@ -49,7 +49,7 @@ class MoviesRepositoryImplTest {
     }
 
     @Test
-    fun `Devuelve los detalles de la película desde remote si están disponibles`() = runBlocking {
+    fun `dado que remoto tiene datos de la película, al llamar a getMovieDetail, devuelve los detalles de la película desde remote si están disponibles`() = runBlocking {
         val remoteMovie = RemoteMovie(2, "title2", "overview2", "2020-02-02", "/poster2.jpg", null, "originalTitle2", "es", 2.0, 7.0)
         remoteDataSource.remoteMovie = remoteMovie
         val result = repository.getMovieDetail(2)
@@ -58,7 +58,7 @@ class MoviesRepositoryImplTest {
     }
 
     @Test
-    fun `En caso de error remoto, se recurre a la caché local`() = runBlocking {
+    fun `en caso de error remoto, se recurre a la caché local`() = runBlocking {
         remoteDataSource.shouldThrow = true
         val cachedMovie = Movie(3, "title3", "overview3", "2020-03-03", "poster3", null, "originalTitle3", "fr", 3.0, 6.0)
         localDataSource.cachedMovieDetail = cachedMovie

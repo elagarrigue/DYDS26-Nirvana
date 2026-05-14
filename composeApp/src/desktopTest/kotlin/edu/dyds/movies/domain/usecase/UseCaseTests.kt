@@ -45,7 +45,7 @@ class UseCaseTests {
     }
 
     @Test
-    fun `getMovieDetails busca la pelicula por id`() = runTest {
+    fun `al solicitar el detalle con un id específico, el repositorio recibe ese mismo id`() = runTest {
         val movieId = 42
 
         getMovieDetailsUseCase.getMovieDetails(movieId)
@@ -54,7 +54,7 @@ class UseCaseTests {
     }
 
     @Test
-    fun `getMovieDetails devuelve null si el repositorio no encuentra la pelicula`() = runTest {
+    fun `si el repositorio no encuentra la pelicula, getMovieDetails devuelve null`() = runTest {
         repository.movieDetail = null
 
         val result = getMovieDetailsUseCase.getMovieDetails(99)
@@ -63,7 +63,7 @@ class UseCaseTests {
     }
 
     @Test
-    fun `GetPopularMovies devuelve peliculas calificadas y ordenadas por voteAverage`() = runTest {
+    fun `getPopularMovies devuelve peliculas calificadas y ordenadas por voteAverage`() = runTest {
         val badMovie = default.copy(id = 1, title = "Bad Movie", voteAverage = 5.9)
         val bestMovie = default.copy(id = 2, title = "Best Movie", voteAverage = 9.0)
         val goodMovie = default.copy(id = 3, title = "Good Movie", voteAverage = 6.0)
@@ -82,7 +82,7 @@ class UseCaseTests {
     }
 
     @Test
-    fun `GetPopularMovies devuelve lista vacia si el repositorio no tiene peliculas`() = runTest {
+    fun `si el repositorio no tiene peliculas, getPopularMovies devuelve lista vacia`() = runTest {
         repository.popularMovies = emptyList()
 
         val result = getPopularMoviesUseCase.GetPopularMovies()

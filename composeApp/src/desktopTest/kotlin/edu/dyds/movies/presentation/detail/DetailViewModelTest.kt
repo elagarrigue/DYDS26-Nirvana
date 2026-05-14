@@ -2,9 +2,12 @@ package edu.dyds.movies.presentation.detail
 
 import edu.dyds.movies.commonFakes.FakeGetMovieDetailsUseCase
 import edu.dyds.movies.domain.entity.Movie
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -36,23 +39,47 @@ class DetailViewModelTest {
 
     @Test
     fun `emite carga y luego película cuando se encuentra la película`() = runTest {
+        val continueUseCase = CompletableDeferred<Unit>()
         fakeUseCase.movieToReturn = default
+        fakeUseCase.beforeReturning = { continueUseCase.await() }
 
         viewModel.getMovieDetail(1)
+        advanceUntilIdle()
 
-        val state = viewModel.movieDetailStateFlow.first { !it.isLoading }
-        assertEquals(default, state.movie)
-        assertEquals(false, state.isLoading)
+        val loadingState = withTimeout(1_000) {
+            viewModel.movieDetailStateFlow.first { it.isLoading }
+        }
+        assertEquals(true, loadingState.isLoading)
+        assertNull(loadingState.movie)
+
+        continueUseCase.complete(Unit)
+        advanceUntilIdle()
+
+        val finalState = viewModel.movieDetailStateFlow.first { !it.isLoading }
+        assertEquals(false, finalState.isLoading)
+        assertEquals(default, finalState.movie)
     }
 
     @Test
     fun `Emite carga y luego null cuando no se encuentra la película`() = runTest {
+        val continueUseCase = CompletableDeferred<Unit>()
         fakeUseCase.movieToReturn = null
+        fakeUseCase.beforeReturning = { continueUseCase.await() }
 
         viewModel.getMovieDetail(99)
+        advanceUntilIdle()
 
-        val state = viewModel.movieDetailStateFlow.first { !it.isLoading }
-        assertNull(state.movie)
-        assertEquals(false, state.isLoading)
+        val loadingState = withTimeout(1_000) {
+            viewModel.movieDetailStateFlow.first { it.isLoading }
+        }
+        assertEquals(true, loadingState.isLoading)
+        assertNull(loadingState.movie)
+
+        continueUseCase.complete(Unit)
+        advanceUntilIdle()
+
+        val finalState = viewModel.movieDetailStateFlow.first { !it.isLoading }
+        assertEquals(false, finalState.isLoading)
+        assertNull(finalState.movie)
     }
 }

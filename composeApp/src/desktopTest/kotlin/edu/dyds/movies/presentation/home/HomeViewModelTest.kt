@@ -3,9 +3,12 @@ package edu.dyds.movies.presentation.home
 import edu.dyds.movies.commonFakes.FakeGetPopularMoviesUseCase
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -49,23 +52,47 @@ class HomeViewModelTest {
             defaultGoodMovie,
             defaultBadMovie
         )
+        val continueUseCase = CompletableDeferred<Unit>()
         fakeUseCase.moviesToReturn = movies
+        fakeUseCase.beforeReturning = { continueUseCase.await() }
 
         viewModel.getAllMovies()
+        advanceUntilIdle()
 
-        val state = viewModel.moviesStateFlow.first { !it.isLoading }
-        assertEquals(movies, state.movies)
-        assertEquals(false, state.isLoading)
+        val loadingState = withTimeout(1_000) {
+            viewModel.moviesStateFlow.first { it.isLoading }
+        }
+        assertEquals(true, loadingState.isLoading)
+        assertEquals(emptyList<QualifiedMovie>(), loadingState.movies)
+
+        continueUseCase.complete(Unit)
+        advanceUntilIdle()
+
+        val finalState = viewModel.moviesStateFlow.first { !it.isLoading }
+        assertEquals(false, finalState.isLoading)
+        assertEquals(movies, finalState.movies)
     }
 
     @Test
     fun `Emite un mensaje de carga y luego una lista vacía cuando no se encuentran películas`() = runTest {
+        val continueUseCase = CompletableDeferred<Unit>()
         fakeUseCase.moviesToReturn = emptyList()
+        fakeUseCase.beforeReturning = { continueUseCase.await() }
 
         viewModel.getAllMovies()
+        advanceUntilIdle()
 
-        val state = viewModel.moviesStateFlow.first { !it.isLoading }
-        assertEquals(emptyList<Any>(), state.movies)
-        assertEquals(false, state.isLoading)
+        val loadingState = withTimeout(1_000) {
+            viewModel.moviesStateFlow.first { it.isLoading }
+        }
+        assertEquals(true, loadingState.isLoading)
+        assertEquals(emptyList<QualifiedMovie>(), loadingState.movies)
+
+        continueUseCase.complete(Unit)
+        advanceUntilIdle()
+
+        val finalState = viewModel.moviesStateFlow.first { !it.isLoading }
+        assertEquals(false, finalState.isLoading)
+        assertEquals(emptyList<QualifiedMovie>(), finalState.movies)
     }
 }

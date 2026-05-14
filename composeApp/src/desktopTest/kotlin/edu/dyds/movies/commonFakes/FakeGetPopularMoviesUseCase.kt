@@ -5,6 +5,11 @@ import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
 
 class FakeGetPopularMoviesUseCase : GetPopularMoviesUseCase {
     var moviesToReturn: List<QualifiedMovie> = emptyList()
-    override suspend fun GetPopularMovies(): List<QualifiedMovie> = moviesToReturn
+    var beforeReturning: suspend () -> Unit = {}
+
+    override suspend fun GetPopularMovies(): List<QualifiedMovie> {
+        beforeReturning()
+        return moviesToReturn
+    }
 }
 

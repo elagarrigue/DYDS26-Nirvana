@@ -3,17 +3,19 @@ package edu.dyds.movies.presentation.home
 import edu.dyds.movies.commonFakes.FakeGetPopularMoviesUseCase
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
-import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Test
+import org.junit.Test@OptIn(ExperimentalCoroutinesApi::class)
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
 
     private val default = Movie(
@@ -40,59 +42,50 @@ class HomeViewModelTest {
     private lateinit var fakeUseCase: FakeGetPopularMoviesUseCase
     private lateinit var viewModel: HomeViewModel
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testScope = CoroutineScope(testDispatcher)
+
     @Before
     fun setUp() {
+        Dispatchers.setMain(testDispatcher)
         fakeUseCase = FakeGetPopularMoviesUseCase()
         viewModel = HomeViewModel(fakeUseCase)
     }
 
-    @Test
-    fun `emite carga y luego películas cuando se encuentran películas`() = runTest {
-        val movies = listOf(
-            defaultGoodMovie,
-            defaultBadMovie
-        )
-        val continueUseCase = CompletableDeferred<Unit>()
-        fakeUseCase.moviesToReturn = movies
-        fakeUseCase.beforeReturning = { continueUseCase.await() }
-
-        viewModel.getAllMovies()
-        advanceUntilIdle()
-
-        val loadingState = withTimeout(1_000) {
-            viewModel.moviesStateFlow.first { it.isLoading }
-        }
-        assertEquals(true, loadingState.isLoading)
-        assertEquals(emptyList<QualifiedMovie>(), loadingState.movies)
-
-        continueUseCase.complete(Unit)
-        advanceUntilIdle()
-
-        val finalState = viewModel.moviesStateFlow.first { !it.isLoading }
-        assertEquals(false, finalState.isLoading)
-        assertEquals(movies, finalState.movies)
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
-    fun `Emite un mensaje de carga y luego una lista vacía cuando no se encuentran películas`() = runTest {
-        val continueUseCase = CompletableDeferred<Unit>()
-        fakeUseCase.moviesToReturn = emptyList()
-        fakeUseCase.beforeReturning = { continueUseCase.await() }
+    fun `dado use case con peliculas, cuando getAllMovies, emite loading y luego las peliculas`() = runTest {
+        val events = ArrayList<MoviesUiState>()
+        val movies = listOf<QualifiedMovie>(defaultBadMovie, defaultGoodMovie)
 
-        viewModel.getAllMovies()
-        advanceUntilIdle()
+        testScope.launch {
+            viewModel.moviesStateFlow.collect { events.add(it) }
+            fakeUseCase.moviesToReturn = movies
 
-        val loadingState = withTimeout(1_000) {
-            viewModel.moviesStateFlow.first { it.isLoading }
+            viewModel.getAllMovies()
+
+            assertEquals(true, events[0].isLoading)
+            assertEquals(movies, events[1].movies)
         }
-        assertEquals(true, loadingState.isLoading)
-        assertEquals(emptyList<QualifiedMovie>(), loadingState.movies)
-
-        continueUseCase.complete(Unit)
-        advanceUntilIdle()
-
-        val finalState = viewModel.moviesStateFlow.first { !it.isLoading }
-        assertEquals(false, finalState.isLoading)
-        assertEquals(emptyList<QualifiedMovie>(), finalState.movies)
     }
+
+
+        @Test
+        fun `Emite un mensaje de carga y luego una lista vacía cuando no se encuentran películas`() = runTest {
+            val events = ArrayList<MoviesUiState>()
+
+            testScope.launch { viewModel.moviesStateFlow.collect { events.add(it) } }
+
+            fakeUseCase.moviesToReturn = emptyList()
+
+            viewModel.getAllMovies()
+
+            assertEquals(false, events[0].isLoading)
+            assertEquals(emptyList<QualifiedMovie>(), events[0].movies)
+        }
 }

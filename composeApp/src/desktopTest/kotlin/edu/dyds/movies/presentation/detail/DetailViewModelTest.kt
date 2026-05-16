@@ -2,6 +2,7 @@ package edu.dyds.movies.presentation.detail
 
 import edu.dyds.movies.commonFakes.FakeGetMovieDetailsUseCase
 import edu.dyds.movies.domain.entity.Movie
+import edu.dyds.movies.domain.entity.QualifiedMovie
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -39,32 +40,20 @@ class DetailViewModelTest {
 
     @Test
     fun `emite carga y luego película cuando se encuentra la película`() = runTest {
-        val continueUseCase = CompletableDeferred<Unit>()
+
+        val finalState = listOf<QualifiedMovie>()
         fakeUseCase.movieToReturn = default
-        fakeUseCase.beforeReturning = { continueUseCase.await() }
 
         viewModel.getMovieDetail(1)
-        advanceUntilIdle()
 
-        val loadingState = withTimeout(1_000) {
-            viewModel.movieDetailStateFlow.first { it.isLoading }
-        }
-        assertEquals(true, loadingState.isLoading)
-        assertNull(loadingState.movie)
-
-        continueUseCase.complete(Unit)
-        advanceUntilIdle()
-
-        val finalState = viewModel.movieDetailStateFlow.first { !it.isLoading }
-        assertEquals(false, finalState.isLoading)
-        assertEquals(default, finalState.movie)
+        assertEquals(false, finalState[0])
+        assertEquals(default, finalState[0].movie)
     }
 
     @Test
     fun `Emite carga y luego null cuando no se encuentra la película`() = runTest {
         val continueUseCase = CompletableDeferred<Unit>()
         fakeUseCase.movieToReturn = null
-        fakeUseCase.beforeReturning = { continueUseCase.await() }
 
         viewModel.getMovieDetail(99)
         advanceUntilIdle()

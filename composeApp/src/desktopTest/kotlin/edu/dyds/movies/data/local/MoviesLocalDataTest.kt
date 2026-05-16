@@ -43,7 +43,7 @@ class MoviesLocalDataTest {
     }
 
     @Test
-    fun `guardar nuevas peliculas, entonces se reemplaza el cache anterior`() = runTest {
+    fun `dada una cache con peliculas, cuando se guarda una lista nueva de peliculas, se reemplaza el cache anterior`() = runTest {
         localDataSource.savePopularMovies(listOf(default.copy(id = 1), default.copy(id = 2)))
         val secondBatch = listOf(default.copy(id = 3), default.copy(id = 4))
 
@@ -52,7 +52,7 @@ class MoviesLocalDataTest {
         assertEquals(secondBatch, localDataSource.getPopularMoviesFromCache())
     }
     @Test
-    fun `guardar una lista vacia en cache, entonces estara vacia la cache`() = runTest {
+    fun `dada una cache con peliculas, al guardar una lista vacia, entonces la cache queda vacia`() = runTest {
         localDataSource.savePopularMovies(listOf(default.copy(id = 1)))
 
         localDataSource.savePopularMovies(emptyList())
@@ -77,7 +77,7 @@ class MoviesLocalDataTest {
         assertNull(result)
     }
     @Test
-    fun `dada una cache vacia, una busqueda de descripcion, retorna null`() = runTest {
+    fun `dada una cache vacia, al buscar el detalle de una pelicula por id, retorna null`() = runTest {
         val result = localDataSource.getMovieDetailFromCache(1)
 
         assertNull(result)

@@ -36,7 +36,7 @@ class UseCaseTests {
     }
 
     @Test
-    fun `getMovieDetails devuelve la pelicula del repositorio`() = runTest {
+    fun `dado un repositorio con la pelicula, al solicitar el detalle, devuelve esa pelicula`() = runTest {
         repository.movieDetail = default
 
         val result = getMovieDetailsUseCase.getMovieDetails(10)
@@ -63,7 +63,7 @@ class UseCaseTests {
     }
 
     @Test
-    fun `getPopularMovies devuelve peliculas calificadas y ordenadas por voteAverage`() = runTest {
+    fun `dado un repositorio con peliculas, getPopularMovies devuelve peliculas calificadas y ordenadas por voteAverage`() = runTest {
         val badMovie = default.copy(id = 1, title = "Bad Movie", voteAverage = 5.9)
         val bestMovie = default.copy(id = 2, title = "Best Movie", voteAverage = 9.0)
         val goodMovie = default.copy(id = 3, title = "Good Movie", voteAverage = 6.0)

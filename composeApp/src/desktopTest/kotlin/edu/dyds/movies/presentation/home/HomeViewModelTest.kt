@@ -1,20 +1,29 @@
 package edu.dyds.movies.presentation.home
 
-import edu.dyds.movies.commonFakes.FakeGetPopularMoviesUseCase
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
+import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.time.delay
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Test@OptIn(ExperimentalCoroutinesApi::class)
+import org.junit.Test
+
+@OptIn(ExperimentalCoroutinesApi::class)
 
 class HomeViewModelTest {
 
@@ -39,7 +48,7 @@ class HomeViewModelTest {
         movie = default,
         isGoodMovie = false
     )
-    private lateinit var fakeUseCase: FakeGetPopularMoviesUseCase
+    private val useCase = mockk<GetPopularMoviesUseCase>(relaxed = true)
     private lateinit var viewModel: HomeViewModel
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -49,43 +58,88 @@ class HomeViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        fakeUseCase = FakeGetPopularMoviesUseCase()
-        viewModel = HomeViewModel(fakeUseCase)
+        viewModel = HomeViewModel(useCase)
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+        clearAllMocks()
     }
 
     @Test
-    fun `dado use case con peliculas, cuando getAllMovies, emite loading y luego las peliculas`() = runTest {
+    fun `el viewmodel suelta una lista vacia y isLoading es falso en su etapa incial`() = runTest {
         val events = ArrayList<MoviesUiState>()
-        val movies = listOf<QualifiedMovie>(defaultBadMovie, defaultGoodMovie)
+        val movies = emptyList<QualifiedMovie>()
 
-        testScope.launch {
-            viewModel.moviesStateFlow.collect { events.add(it) }
-            fakeUseCase.moviesToReturn = movies
+        val job = testScope.launch { viewModel.moviesStateFlow.collect { events.add(it) } }
 
-            viewModel.getAllMovies()
-
-            assertEquals(true, events[0].isLoading)
-            assertEquals(movies, events[1].movies)
-        }
+        assertEquals(false, events[0].isLoading)
+        assertEquals(movies, events[0].movies)
+        job.cancel()
     }
 
 
-        @Test
-        fun `Emite un mensaje de carga y luego una lista vacía cuando no se encuentran películas`() = runTest {
-            val events = ArrayList<MoviesUiState>()
+    @Test
+    fun `cuando se usa getAllMovies, emite loading false y las peliculas al finalizar su ejecucion`() = runTest {
+        val events = ArrayList<MoviesUiState>()
+        val movies = listOf<QualifiedMovie>(defaultGoodMovie, defaultBadMovie)
 
-            testScope.launch { viewModel.moviesStateFlow.collect { events.add(it) } }
-
-            fakeUseCase.moviesToReturn = emptyList()
-
-            viewModel.getAllMovies()
-
-            assertEquals(false, events[0].isLoading)
-            assertEquals(emptyList<QualifiedMovie>(), events[0].movies)
+        val job = testScope.launch {
+            viewModel.moviesStateFlow.collect { events.add(it) }
         }
+
+        coEvery { useCase.GetPopularMovies() } returns movies
+
+        viewModel.getAllMovies()
+
+        advanceUntilIdle()
+
+        assertEquals(false, events[1].isLoading)
+        assertEquals(movies, events[1].movies)
+        coVerify(exactly = 1) { useCase.GetPopularMovies() }
+        job.cancel()
+    }
+
+
+    @Test
+    fun `Emite un mensaje de carga y luego una lista vacía cuando no se encuentran películas`() = runTest {
+        val events = ArrayList<MoviesUiState>()
+
+        val job =testScope.launch { viewModel.moviesStateFlow.collect { events.add(it) } }
+
+        coEvery { useCase.GetPopularMovies() } returns emptyList()
+        viewModel.getAllMovies()
+
+        advanceUntilIdle()
+
+        assertEquals(false, events[0].isLoading)
+        assertEquals(emptyList<QualifiedMovie>(), events[0].movies)
+        coVerify(exactly = 1) { useCase.GetPopularMovies() }
+        job.cancel()
+    }
+
+    @Test
+    fun `el estado intermedio emitido por getAllMovie es isLoading true y la lista de peliculas vaica`() = runTest {
+        val emissions = arrayListOf<MoviesUiState>()
+        val job = testScope.launch {
+            viewModel.moviesStateFlow.collect { emissions.add(it) }
+        }
+
+        coEvery { useCase.GetPopularMovies() } coAnswers {
+            delay(10)
+            listOf(defaultGoodMovie, defaultBadMovie)
+        }
+
+        viewModel.getAllMovies()
+
+        assertEquals(true,emissions.any { it.isLoading })
+
+        advanceUntilIdle()
+
+        val final = emissions.last()
+        assertEquals(false,final.isLoading)
+        assertEquals(listOf(defaultGoodMovie, defaultBadMovie), final.movies)
+        job.cancel()
+    }
 }

@@ -17,7 +17,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.time.delay
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -69,23 +68,22 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `el viewmodel suelta una lista vacia y isLoading es falso en su etapa incial`() = runTest {
+    fun `el viewmodel emite una lista vacia y isLoading falso en su etapa incial`() = runTest {
         val events = ArrayList<MoviesUiState>()
         val movies = emptyList<QualifiedMovie>()
 
         val job = testScope.launch { viewModel.moviesStateFlow.collect { events.add(it) } }
 
-        assertEquals(false, events[0].isLoading)
-        assertEquals(movies, events[0].movies)
+        assertEquals(false, events.last().isLoading)
+        assertEquals(movies, events.last().movies)
         job.cancel()
     }
 
 
     @Test
-    fun `cuando se usa getAllMovies, emite loading false y las peliculas al finalizar su ejecucion`() = runTest {
+    fun `Se usa getAllMovies con una lista no nula, emite isLoading false y las peliculas al finalizar su ejecucion`() = runTest {
         val events = ArrayList<MoviesUiState>()
         val movies = listOf<QualifiedMovie>(defaultGoodMovie, defaultBadMovie)
-
         val job = testScope.launch {
             viewModel.moviesStateFlow.collect { events.add(it) }
         }
@@ -96,29 +94,30 @@ class HomeViewModelTest {
 
         advanceUntilIdle()
 
-        assertEquals(false, events[1].isLoading)
-        assertEquals(movies, events[1].movies)
+        assertEquals(false, events.last().isLoading)
+        assertEquals(movies, events.last().movies)
         coVerify(exactly = 1) { useCase.GetPopularMovies() }
         job.cancel()
     }
 
 
     @Test
-    fun `Emite un mensaje de carga y luego una lista vacía cuando no se encuentran películas`() = runTest {
+    fun `Al ejecutar getAllMovies con una lista vacia, devuleve isLoading false y la lista vacia`() = runTest {
         val events = ArrayList<MoviesUiState>()
-
         val job =testScope.launch { viewModel.moviesStateFlow.collect { events.add(it) } }
 
         coEvery { useCase.GetPopularMovies() } returns emptyList()
+
         viewModel.getAllMovies()
         advanceUntilIdle()
+
         assertFalse(events.last().isLoading)
         assertEquals(emptyList<QualifiedMovie>(), events.last().movies)
         job.cancel()
     }
 
     @Test
-    fun `el estado intermedio emitido por getAllMovie es isLoading true y la lista de peliculas vaica`() = runTest {
+    fun `el estado intermedio emitido por getAllMovie es isLoading true y la lista de peliculas vacia`() = runTest {
         val emissions = arrayListOf<MoviesUiState>()
         val job = testScope.launch {
             viewModel.moviesStateFlow.collect { emissions.add(it) }

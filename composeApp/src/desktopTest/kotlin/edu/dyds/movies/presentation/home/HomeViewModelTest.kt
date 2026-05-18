@@ -68,20 +68,20 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `el viewmodel emite una lista vacia y isLoading falso en su etapa incial`() = runTest {
+    fun `El primer estado del ViewModel es isLoading false y la lista vacia`() = runTest {
         val events = ArrayList<MoviesUiState>()
         val movies = emptyList<QualifiedMovie>()
 
         val job = testScope.launch { viewModel.moviesStateFlow.collect { events.add(it) } }
 
-        assertEquals(false, events.last().isLoading)
-        assertEquals(movies, events.last().movies)
+        assertEquals(false, events.first().isLoading)
+        assertEquals(movies, events.first().movies)
         job.cancel()
     }
 
 
     @Test
-    fun `Se usa getAllMovies con una lista no nula, emite isLoading false y las peliculas al finalizar su ejecucion`() = runTest {
+    fun `Al llamar getAllMovies con una lista no nula, emite isLoading false y las peliculas al finalizar`() = runTest {
         val events = ArrayList<MoviesUiState>()
         val movies = listOf<QualifiedMovie>(defaultGoodMovie, defaultBadMovie)
         val job = testScope.launch {
@@ -102,7 +102,7 @@ class HomeViewModelTest {
 
 
     @Test
-    fun `Al ejecutar getAllMovies con una lista vacia, devuleve isLoading false y la lista vacia`() = runTest {
+    fun `Al llamar getAllMovies con una lista vacia, emite isLoading false y la lista vacia al finalizar`() = runTest {
         val events = ArrayList<MoviesUiState>()
         val job =testScope.launch { viewModel.moviesStateFlow.collect { events.add(it) } }
 
@@ -117,7 +117,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `el estado intermedio emitido por getAllMovie es isLoading true y la lista de peliculas vacia`() = runTest {
+    fun `Al llamar getAllMovies, emite isLoading es true y luego el emite isLoading false y la lista de peliculas`() = runTest {
         val emissions = arrayListOf<MoviesUiState>()
         val job = testScope.launch {
             viewModel.moviesStateFlow.collect { emissions.add(it) }

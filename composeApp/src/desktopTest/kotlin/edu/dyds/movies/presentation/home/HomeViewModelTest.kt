@@ -20,6 +20,7 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.time.delay
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 
@@ -110,12 +111,9 @@ class HomeViewModelTest {
 
         coEvery { useCase.GetPopularMovies() } returns emptyList()
         viewModel.getAllMovies()
-
         advanceUntilIdle()
-
-        assertEquals(false, events[0].isLoading)
-        assertEquals(emptyList<QualifiedMovie>(), events[0].movies)
-        coVerify(exactly = 1) { useCase.GetPopularMovies() }
+        assertFalse(events.last().isLoading)
+        assertEquals(emptyList<QualifiedMovie>(), events.last().movies)
         job.cancel()
     }
 

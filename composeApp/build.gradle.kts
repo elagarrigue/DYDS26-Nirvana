@@ -12,6 +12,7 @@ kotlin {
     
     sourceSets {
         val desktopMain by getting
+        val desktopTest by getting
 
         commonMain.dependencies {
             implementation(libs.kotlin.test)
@@ -39,12 +40,18 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             runtimeOnly(libs.slf4j.simple)
         }
+        desktopTest.dependencies {
+            implementation(libs.mockk)
+        }
     }
 
     sourceSets.commonMain {
         kotlin.srcDirs("build/generated/ksp/metadata")
     }
 
+    tasks.withType<Test>().configureEach {
+        jvmArgs("-XX:+EnableDynamicAgentLoading")
+    }
 }
 
 
@@ -65,4 +72,3 @@ tasks.withType<JavaExec>().configureEach {
         mainClass.set("edu.dyds.movies.MainKt")
     }
 }
-

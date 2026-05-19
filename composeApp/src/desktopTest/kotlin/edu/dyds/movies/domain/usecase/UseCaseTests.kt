@@ -39,25 +39,25 @@ class UseCaseTests {
     fun `dado un repositorio con la pelicula, al solicitar el detalle, devuelve esa pelicula`() = runTest {
         repository.movieDetail = default
 
-        val result = getMovieDetailsUseCase.getMovieDetails(10)
+        val result = getMovieDetailsUseCase.getMovieDetails("Fake Movie")
 
         assertEquals(default, result)
     }
 
     @Test
-    fun `al solicitar el detalle con un id específico, el repositorio recibe ese mismo id`() = runTest {
-        val movieId = 42
+    fun `al solicitar el detalle con un titulo específico, el repositorio recibe ese mismo titulo`() = runTest {
+        val movieTitle = "The Matrix"
 
-        getMovieDetailsUseCase.getMovieDetails(movieId)
+        getMovieDetailsUseCase.getMovieDetails(movieTitle)
 
-        assertEquals(movieId, repository.requestedMovieDetailId)
+        assertEquals(movieTitle, repository.requestedMovieDetailTitle)
     }
 
     @Test
     fun `si el repositorio no encuentra la pelicula, getMovieDetails devuelve null`() = runTest {
         repository.movieDetail = null
 
-        val result = getMovieDetailsUseCase.getMovieDetails(99)
+        val result = getMovieDetailsUseCase.getMovieDetails("Unknown")
 
         assertNull(result)
     }

@@ -24,12 +24,13 @@ class MoviesRepositoryImpl(
         return domainMovies
     }
 
-    override suspend fun getMovieDetail(id: Int): Movie? {
+    override suspend fun getMovieDetail(title: String): Movie? {
         return try {
-            val remoteMovie = remoteDataSource.getMovieDetails(id)
+            val remoteMovie = remoteDataSource.getMovieDetails(title)
             movieMapper.toDomainMovie(remoteMovie)
         } catch (e: IOException) {
-            localDataSource.getMovieDetailFromCache(id)
+            localDataSource.getPopularMoviesFromCache()
+                .find { it.title.equals(title, ignoreCase = true) }
         }
     }
 }

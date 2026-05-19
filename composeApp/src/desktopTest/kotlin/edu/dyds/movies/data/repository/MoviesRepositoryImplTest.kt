@@ -52,7 +52,7 @@ class MoviesRepositoryImplTest {
     fun `dado que remoto tiene datos de la película, al llamar a getMovieDetail, devuelve los detalles de la película desde remote si están disponibles`() = runBlocking {
         val remoteMovie = RemoteMovie(2, "title2", "overview2", "2020-02-02", "/poster2.jpg", null, "originalTitle2", "es", 2.0, 7.0)
         remoteDataSource.remoteMovie = remoteMovie
-        val result = repository.getMovieDetail(2)
+        val result = repository.getMovieDetail("title2")
         assertNotNull(result)
         assertEquals(remoteMovie.id, result.id)
     }
@@ -62,7 +62,7 @@ class MoviesRepositoryImplTest {
         remoteDataSource.shouldThrow = true
         val cachedMovie = Movie(3, "title3", "overview3", "2020-03-03", "poster3", null, "originalTitle3", "fr", 3.0, 6.0)
         localDataSource.cachedMovieDetail = cachedMovie
-        val result = repository.getMovieDetail(3)
+        val result = repository.getMovieDetail("title3")
         assertEquals(cachedMovie, result)
     }
 }

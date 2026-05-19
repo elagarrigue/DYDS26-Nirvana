@@ -1,0 +1,75 @@
+Plan
+1.
+Cambiar el contrato de detalle de película de id a title en toda la cadena de detalle:
+◦
+GetMovieDetailsUseCase.getMovieDetails(id: Int) -> getMovieDetails(title: String)
+◦
+MoviesRepository.getMovieDetail(id: Int) -> getMovieDetail(title: String)
+◦
+MoviesRemoteDataSource.getMovieDetails(id: Int) -> getMovieDetails(title: String)
+◦
+DetailViewModel.getMovieDetail(id: Int) -> getMovieDetail(title: String)
+2.
+Ajustar navegación para enviar título al detalle:
+◦
+En Navigation.kt, reemplazar movieId por movieTitle en la ruta.
+◦
+Hacer URL-encode/decode del título para evitar problemas con espacios/símbolos.
+◦
+HomeScreen no cambia funcionalmente (la lista sigue igual); solo cambia el argumento que se pasa al navegar.
+3.
+Separar clientes remotos por proveedor:
+◦
+Mantener TMDB para getPopularMovies.
+◦
+Crear cliente HTTP OMDB (host = www.omdbapi.com, query apikey=...).
+◦
+Evitar reutilizar el cliente TMDB porque hoy inyecta api_key y host fijos.
+4.
+Incorporar datasource/modelo OMDB:
+◦
+Crear OmdbRemoteMovie (campos serializables de OMDB).
+◦
+Implementar request por título (?t=<title>).
+◦
+Manejar respuesta “not found” (OMDB responde Response: "False" + Error) sin romper flujo.
+5.
+Resolver mapeo y enriquecimiento de detalle:
+◦
+Estrategia recomendada: seguir devolviendo Movie y enriquecer campos existentes con OMDB cuando aplique.
+◦
+Si se quieren mostrar campos nuevos (ej. runtime, genre, imdbRating), extender Movie + UI + strings.
+◦
+Definir regla de merge TMDB vs OMDB (qué fuente tiene prioridad por campo).
+6.
+Actualizar fallback de caché local:
+◦
+Como el detalle ya no entra por id, en local cambiar búsqueda a title (idealmente normalizada, case-insensitive).
+◦
+Mantener el comportamiento actual: si falla remoto, intentar cache.
+7.
+Refactor de DI/config:
+◦
+Inyectar ambos data sources (TMDB + OMDB) en MoviesRepositoryImpl.
+◦
+Mover keys de API fuera del código hardcodeado (gradle properties/env vars) para TMDB y OMDB.
+8.
+Actualizar tests unitarios:
+◦
+Fakes (FakeMoviesRemoteDataSource, FakeMoviesRepository) para trabajar con title.
+◦
+Tests de use case/viewmodel/repository para:
+▪
+llamada por título,
+▪
+éxito remoto OMDB,
+▪
+fallback a caché por título,
+▪
+título no encontrado en OMDB.
+9.
+Verificación final:
+◦
+Ejecutar suite de tests.
+◦
+Prueba manual: abrir home, entrar a detalle de una película conocida, validar que los datos de detalle vengan por título y que la lista no cambió.

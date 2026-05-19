@@ -10,6 +10,8 @@ class MoviesRemoteDataSourceImpl(
     override suspend fun getPopularMovies(): RemoteResult =
         httpClient.get("/3/discover/movie?sort_by=popularity.desc").body()
 
-    override suspend fun getMovieDetails(id: Int): RemoteMovie =
-        httpClient.get("/3/movie/$id").body()
+    override suspend fun getMovieDetails(title: String): RemoteMovie =
+        httpClient.get("/3/search/movie") {
+            parameter("query", title)
+        }.body<RemoteResult>().results.first()
 }

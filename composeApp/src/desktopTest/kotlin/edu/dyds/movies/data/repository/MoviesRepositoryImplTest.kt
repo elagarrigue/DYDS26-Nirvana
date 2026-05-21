@@ -61,7 +61,7 @@ class MoviesRepositoryImplTest {
     fun `en caso de error remoto, se recurre a la caché local`() = runBlocking {
         remoteDataSource.shouldThrow = true
         val cachedMovie = Movie(3, "title3", "overview3", "2020-03-03", "poster3", null, "originalTitle3", "fr", 3.0, 6.0)
-        localDataSource.cachedMovieDetail = cachedMovie
+        localDataSource.cachedMovies = listOf(cachedMovie)
         val result = repository.getMovieDetail("title3")
         assertEquals(cachedMovie, result)
     }

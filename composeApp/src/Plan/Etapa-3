@@ -25,7 +25,17 @@ Mantener TMDB para getPopularMovies.
 Crear cliente HTTP OMDB (host = www.omdbapi.com, query apikey=...).
 ◦
 Evitar reutilizar el cliente TMDB porque hoy inyecta api_key y host fijos.
+◦
+Crear `TMDBMoviesExternalSource` y `OMDBMoviesExternalSource` como implementaciones concretas por proveedor.
 4.
+Agregar broker de fuentes externas:
+◦
+Crear `MovieExternalSourceBroker` que implemente `MovieExternalSource`.
+◦
+El broker debe depender de `TMDBMoviesExternalSource` y `OMDBMoviesExternalSource`.
+◦
+Implementar en el broker la lógica del requerimiento (orquestación/merge/fallback entre proveedores).
+5.
 Incorporar datasource/modelo OMDB:
 ◦
 Crear OmdbRemoteMovie (campos serializables de OMDB).
@@ -33,7 +43,7 @@ Crear OmdbRemoteMovie (campos serializables de OMDB).
 Implementar request por título (?t=<title>).
 ◦
 Manejar respuesta “not found” (OMDB responde Response: "False" + Error) sin romper flujo.
-5.
+6.
 Resolver mapeo y enriquecimiento de detalle:
 ◦
 Estrategia recomendada: seguir devolviendo Movie y enriquecer campos existentes con OMDB cuando aplique.
@@ -41,19 +51,19 @@ Estrategia recomendada: seguir devolviendo Movie y enriquecer campos existentes 
 Si se quieren mostrar campos nuevos (ej. runtime, genre, imdbRating), extender Movie + UI + strings.
 ◦
 Definir regla de merge TMDB vs OMDB (qué fuente tiene prioridad por campo).
-6.
+7.
 Actualizar fallback de caché local:
 ◦
 Como el detalle ya no entra por id, en local cambiar búsqueda a title (idealmente normalizada, case-insensitive).
 ◦
 Mantener el comportamiento actual: si falla remoto, intentar cache.
-7.
+8.
 Refactor de DI/config:
 ◦
 Inyectar ambos data sources (TMDB + OMDB) en MoviesRepositoryImpl.
 ◦
 Mover keys de API fuera del código hardcodeado (gradle properties/env vars) para TMDB y OMDB.
-8.
+9.
 Actualizar tests unitarios:
 ◦
 Fakes (FakeMoviesRemoteDataSource, FakeMoviesRepository) para trabajar con title.
@@ -67,7 +77,15 @@ llamada por título,
 fallback a caché por título,
 ▪
 título no encontrado en OMDB.
-9.
+◦
+Agregar tests unitarios específicos del broker (`MovieExternalSourceBroker`) cubriendo:
+▪
+ruteo/orquestación correcta entre `TMDBMoviesExternalSource` y `OMDBMoviesExternalSource`,
+▪
+reglas de merge/prioridad por campo,
+▪
+casos de fallback y errores controlados.
+10.
 Verificación final:
 ◦
 Ejecutar suite de tests.

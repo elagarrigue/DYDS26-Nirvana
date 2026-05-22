@@ -7,5 +7,5 @@ interface MoviesLocalDataSource {
 
     suspend fun getPopularMoviesFromCache(): List<Movie>
 
-    suspend fun getMovieDetailFromCache(id: Int): Movie?
+    suspend fun getMovieDetailFromCache(title: String): Movie?
 }

@@ -7,7 +7,7 @@ class FakeMoviesLocalDataSource : MoviesLocalDataSource {
     var cachedMovies: List<Movie> = emptyList()
     var cachedMovieDetail: Movie? = null
     var savedMovies: List<Movie>? = null
-    var requestedMovieId: Int? = null
+    var requestedMovieTitle: String? = null
 
     override suspend fun savePopularMovies(movies: List<Movie>) {
         savedMovies = movies
@@ -17,9 +17,8 @@ class FakeMoviesLocalDataSource : MoviesLocalDataSource {
         return cachedMovies
     }
 
-    override suspend fun getMovieDetailFromCache(id: Int): Movie? {
-        requestedMovieId = id
+    override suspend fun getMovieDetailFromCache(title: String): Movie? {
+        requestedMovieTitle = title
         return cachedMovieDetail
     }
 }
-

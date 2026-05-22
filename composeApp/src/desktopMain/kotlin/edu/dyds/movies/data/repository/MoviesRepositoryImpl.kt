@@ -24,9 +24,9 @@ class MoviesRepositoryImpl(
         return domainMovies
     }
 
-    override suspend fun getMovieDetail(title: String): Movie? {
+    override suspend fun getMovieByTitle(title: String): Movie? {
         return try {
-            val remoteMovie = remoteDataSource.getMovieDetails(title)
+            val remoteMovie = remoteDataSource.getMovieByTitle(title)
             movieMapper.toDomainMovie(remoteMovie)
         } catch (e: IOException) {
             localDataSource.getPopularMoviesFromCache()

@@ -13,17 +13,17 @@ class MovieMapper {
             id = remoteMovie.id,
             title = remoteMovie.title,
             overview = remoteMovie.overview,
-            releaseDate = remoteMovie.releaseDate,
+            releaseDate = remoteMovie.releaseDate ?: "",
             poster = buildPosterUrl(remoteMovie.posterPath),
             backdrop = buildBackdropUrl(remoteMovie.backdropPath),
             originalTitle = remoteMovie.originalTitle,
             originalLanguage = remoteMovie.originalLanguage,
-            popularity = remoteMovie.popularity,
-            voteAverage = remoteMovie.voteAverage
+            popularity = remoteMovie.popularity ?: 0.0,
+            voteAverage = remoteMovie.voteAverage ?: 0.0
         )
 
-    private fun buildPosterUrl(posterPath: String): String =
-        "$POSTER_BASE_URL$posterPath"
+    private fun buildPosterUrl(posterPath: String?): String =
+        posterPath?.let { "$POSTER_BASE_URL$it" } ?: ""
 
     private fun buildBackdropUrl(backdropPath: String?): String? =
         backdropPath?.let { "$BACKDROP_BASE_URL$it" }

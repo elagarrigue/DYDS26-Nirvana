@@ -10,9 +10,8 @@ class FakeMoviesRepository : MoviesRepository {
 
     override suspend fun getPopularMovies(): List<Movie> = popularMovies
 
-    override suspend fun getMovieDetail(title: String): Movie? {
+    override suspend fun getMovieByTitle(title: String): Movie? {
         requestedMovieDetailTitle = title
         return movieDetail
     }
 }
-

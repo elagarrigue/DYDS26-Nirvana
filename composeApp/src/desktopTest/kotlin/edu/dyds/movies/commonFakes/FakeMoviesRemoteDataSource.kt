@@ -15,10 +15,9 @@ class FakeMoviesRemoteDataSource : MoviesRemoteDataSource {
         return remoteResult ?: throw Exception("No remote result set")
     }
 
-    override suspend fun getMovieDetails(title: String): RemoteMovie {
+    override suspend fun getMovieByTitle(title: String): RemoteMovie {
         requestedMovieTitle = title
         if (shouldThrow) throw java.io.IOException("Remote error")
         return remoteMovie ?: throw Exception("No remote movie set")
     }
 }
-

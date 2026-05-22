@@ -12,6 +12,6 @@ class MoviesLocalDataSourceImpl : MoviesLocalDataSource {
 
     override suspend fun getPopularMoviesFromCache(): List<Movie> = movieCache.toList()
 
-    override suspend fun getMovieDetailFromCache(id: Int): Movie? =
-        movieCache.find { it.id == id }
+    override suspend fun getMovieDetailFromCache(title: String): Movie? =
+        movieCache.find { it.title.equals(title, ignoreCase = true) }
 }

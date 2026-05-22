@@ -2,10 +2,10 @@ package edu.dyds.movies.data.repository
 
 import edu.dyds.movies.commonFakes.FakeMoviesLocalDataSource
 import edu.dyds.movies.commonFakes.FakeMoviesRemoteDataSource
-import edu.dyds.movies.data.remote.mapper.MovieMapper
+import edu.dyds.movies.data.external.mapper.MovieMapper
 import edu.dyds.movies.domain.entity.Movie
-import edu.dyds.movies.data.remote.RemoteMovie
-import edu.dyds.movies.data.remote.RemoteResult
+import edu.dyds.movies.data.external.RemoteMovie
+import edu.dyds.movies.data.external.tmdb.RemoteResult
 import kotlinx.coroutines.runBlocking
 import kotlin.test.*
 

@@ -2,11 +2,11 @@ package edu.dyds.movies.di
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import edu.dyds.movies.data.remote.mapper.MovieMapper
+import edu.dyds.movies.data.external.mapper.MovieMapper
 import edu.dyds.movies.domain.qualifier.MovieQualifier
 import edu.dyds.movies.data.repository.MoviesRepositoryImpl
 import edu.dyds.movies.data.local.MoviesLocalDataSourceImpl
-import edu.dyds.movies.data.remote.MoviesRemoteDataSourceImpl
+import edu.dyds.movies.data.external.tmdb.TMDBMoviesExternalSource
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCaseImpl
 import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
@@ -42,7 +42,7 @@ object MoviesDependencyInjector {
                 requestTimeoutMillis = 5000
             }
         }
-    private val remoteDataSource = MoviesRemoteDataSourceImpl(tmdbHttpClient)
+    private val remoteDataSource = TMDBMoviesExternalSource(tmdbHttpClient)
     private val localDataSource = MoviesLocalDataSourceImpl()
     private val movieMapper = MovieMapper()
     private val movieQualifier = MovieQualifier()

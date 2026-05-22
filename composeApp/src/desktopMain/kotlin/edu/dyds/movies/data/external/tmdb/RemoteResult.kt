@@ -1,5 +1,6 @@
-package edu.dyds.movies.data.remote
+package edu.dyds.movies.data.external.tmdb
 
+import edu.dyds.movies.data.external.RemoteMovie
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

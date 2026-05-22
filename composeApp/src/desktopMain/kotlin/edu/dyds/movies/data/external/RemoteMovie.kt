@@ -1,4 +1,4 @@
-package edu.dyds.movies.data.remote
+package edu.dyds.movies.data.external
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

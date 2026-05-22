@@ -20,7 +20,12 @@ class MoviesRepositoryImplTest {
         remoteDataSource = FakeMoviesRemoteDataSource()
         localDataSource = FakeMoviesLocalDataSource()
         movieMapper = MovieMapper()
-        repository = MoviesRepositoryImpl(remoteDataSource, localDataSource, movieMapper)
+        repository = MoviesRepositoryImpl(
+            moviesExternalSource = remoteDataSource,
+            movieExternalSource = remoteDataSource,
+            localDataSource = localDataSource,
+            movieMapper = movieMapper
+        )
     }
 
     @Test

@@ -1,6 +1,7 @@
 package edu.dyds.movies.data.external.tmdb
 
-import edu.dyds.movies.data.external.MoviesRemoteDataSource
+import edu.dyds.movies.data.external.MovieExternalSource
+import edu.dyds.movies.data.external.MoviesExternalSource
 import edu.dyds.movies.data.external.RemoteMovie
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -8,7 +9,7 @@ import io.ktor.client.request.*
 
 class TMDBMoviesExternalSource(
     private val httpClient: HttpClient
-) : MoviesRemoteDataSource {
+) : MovieExternalSource, MoviesExternalSource {
     override suspend fun getPopularMovies(): RemoteResult =
         httpClient.get("/3/discover/movie?sort_by=popularity.desc").body()
 

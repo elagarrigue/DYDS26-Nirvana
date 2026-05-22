@@ -2,8 +2,10 @@ package edu.dyds.movies.data.external
 
 import edu.dyds.movies.data.external.tmdb.RemoteResult
 
-interface MoviesRemoteDataSource {
-    suspend fun getPopularMovies(): RemoteResult
-
+interface MovieExternalSource {
     suspend fun getMovieByTitle(title: String): RemoteMovie
+}
+
+interface MoviesExternalSource {
+    suspend fun getPopularMovies(): RemoteResult
 }

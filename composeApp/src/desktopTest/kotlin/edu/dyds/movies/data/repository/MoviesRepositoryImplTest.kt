@@ -4,7 +4,7 @@ import edu.dyds.movies.commonFakes.FakeMoviesLocalDataSource
 import edu.dyds.movies.commonFakes.FakeMoviesRemoteDataSource
 import edu.dyds.movies.data.external.mapper.MovieMapper
 import edu.dyds.movies.domain.entity.Movie
-import edu.dyds.movies.data.external.tmdb.RemoteMovie
+import edu.dyds.movies.data.external.tmdb.RemoteTMDB
 import edu.dyds.movies.data.external.tmdb.RemoteResult
 import kotlinx.coroutines.runBlocking
 import kotlin.test.*
@@ -39,7 +39,7 @@ class MoviesRepositoryImplTest {
     @Test
     fun `realiza búsquedas desde el servidor remoto y almacena en caché, si la caché está vacía`() = runBlocking {
         localDataSource.cachedMovies = emptyList()
-        val remoteMovie = RemoteMovie(1, "title", "overview", "2020-01-01", "/poster.jpg", null, "originalTitle", "en", 1.0, 8.0)
+        val remoteMovie = RemoteTMDB(1, "title", "overview", "2020-01-01", "/poster.jpg", null, "originalTitle", "en", 1.0, 8.0)
         remoteDataSource.remoteResult = RemoteResult(
             page = 1,
             results = listOf(remoteMovie),
@@ -55,7 +55,7 @@ class MoviesRepositoryImplTest {
 
     @Test
     fun `dado que remoto tiene datos de la película, al llamar a getMovieByTitle, devuelve los detalles de la película desde remote si están disponibles`() = runBlocking {
-        val remoteMovie = RemoteMovie(2, "title2", "overview2", "2020-02-02", "/poster2.jpg", null, "originalTitle2", "es", 2.0, 7.0)
+        val remoteMovie = RemoteTMDB(2, "title2", "overview2", "2020-02-02", "/poster2.jpg", null, "originalTitle2", "es", 2.0, 7.0)
         remoteDataSource.remoteMovie = remoteMovie
         val result = repository.getMovieByTitle("title2")
         assertNotNull(result)

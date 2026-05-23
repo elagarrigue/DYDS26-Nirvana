@@ -1,16 +1,14 @@
 package edu.dyds.movies.data.repository
 
 import edu.dyds.movies.data.local.MoviesLocalDataSource
-import edu.dyds.movies.data.external.MovieExternalSource
-import edu.dyds.movies.data.external.MoviesExternalSource
+import edu.dyds.movies.data.external.MovieExternalSourceBroker
 import edu.dyds.movies.data.external.mapper.MovieMapper
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.repository.MoviesRepository
 import java.io.IOException
 
 class MoviesRepositoryImpl(
-    private val moviesExternalSource: MoviesExternalSource,
-    private val movieExternalSource: MovieExternalSource,
+    private val movieExternalSource: MovieExternalSourceBroker,
     private val localDataSource: MoviesLocalDataSource,
     private val movieMapper: MovieMapper = MovieMapper()
 ) : MoviesRepository {
@@ -19,7 +17,7 @@ class MoviesRepositoryImpl(
         val cached = localDataSource.getPopularMoviesFromCache()
         if (cached.isNotEmpty()) return cached
 
-        val remoteMovies = moviesExternalSource.getPopularMovies().results
+        val remoteMovies = movieExternalSource.getPopularMovies().results
         val domainMovies = remoteMovies.map(movieMapper::toDomainMovie)
 
         localDataSource.savePopularMovies(domainMovies)

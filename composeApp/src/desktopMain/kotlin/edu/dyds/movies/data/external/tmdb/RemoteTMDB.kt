@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoteMovie(
+data class RemoteTMDB(
     val id: Int,
     val title: String,
     val overview: String,
@@ -13,6 +13,6 @@ data class RemoteMovie(
     @SerialName("backdrop_path") val backdropPath: String?,
     @SerialName("original_title") val originalTitle: String,
     @SerialName("original_language") val originalLanguage: String,
-    val popularity: Double?,
-    @SerialName("vote_average") val voteAverage: Double?,
+    val popularity: Double,
+    @SerialName("vote_average") val voteAverage: Double,
 )

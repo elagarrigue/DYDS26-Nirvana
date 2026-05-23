@@ -6,8 +6,11 @@ import edu.dyds.movies.data.external.mapper.MovieMapper
 import edu.dyds.movies.domain.qualifier.MovieQualifier
 import edu.dyds.movies.data.repository.MoviesRepositoryImpl
 import edu.dyds.movies.data.local.MoviesLocalDataSourceImpl
+import edu.dyds.movies.data.external.MovieExternalSourceBroker
 import edu.dyds.movies.data.external.tmdb.TMDBMoviesExternalSource
 import edu.dyds.movies.data.external.omdb.OMDBMoviesExternalSource
+import edu.dyds.movies.data.external.proxy.OMDBMoviesExternalSourceProxy
+import edu.dyds.movies.data.external.proxy.TMDBMoviesExternalSourceProxy
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCaseImpl
 import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
@@ -64,13 +67,21 @@ object MoviesDependencyInjector {
         }
     private val remoteDataSource = TMDBMoviesExternalSource(tmdbHttpClient)
     private val omdbDataSource = OMDBMoviesExternalSource(omdbHttpClient)
+    private val tmdbExternalSourceProxy = TMDBMoviesExternalSourceProxy(
+        tmdbMoviesExternalSource = remoteDataSource,
+        tmdbMoviesListExternalSource = remoteDataSource
+    )
+    private val omdbExternalSourceProxy = OMDBMoviesExternalSourceProxy(omdbDataSource)
+    private val movieExternalSourceBroker = MovieExternalSourceBroker(
+        tmdbMoviesExternalSourceProxy = tmdbExternalSourceProxy,
+        omdbMoviesExternalSourceProxy = omdbExternalSourceProxy
+    )
     private val localDataSource = MoviesLocalDataSourceImpl()
     private val movieMapper = MovieMapper()
     private val movieQualifier = MovieQualifier()
 
     private val moviesRepository = MoviesRepositoryImpl(
-        moviesExternalSource = remoteDataSource,
-        movieExternalSource = omdbDataSource,
+        movieExternalSource = movieExternalSourceBroker,
         localDataSource = localDataSource,
         movieMapper = movieMapper
     )

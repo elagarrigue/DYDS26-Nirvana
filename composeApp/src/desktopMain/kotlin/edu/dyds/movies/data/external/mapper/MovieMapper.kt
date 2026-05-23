@@ -1,6 +1,6 @@
 package edu.dyds.movies.data.external.mapper
 
-import edu.dyds.movies.data.external.tmdb.RemoteMovie
+import edu.dyds.movies.data.external.tmdb.RemoteTMDB
 import edu.dyds.movies.domain.entity.Movie
 
 private const val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185"
@@ -8,7 +8,7 @@ private const val BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780"
 
 class MovieMapper {
 
-    fun toDomainMovie(remoteMovie: RemoteMovie): Movie =
+    fun toDomainMovie(remoteMovie: RemoteTMDB): Movie =
         Movie(
             id = remoteMovie.id,
             title = remoteMovie.title,

@@ -1,11 +1,11 @@
 package edu.dyds.movies.data.external.omdb
 
-import edu.dyds.movies.data.external.tmdb.RemoteMovie as TmdbRemoteMovie
+import edu.dyds.movies.data.external.tmdb.RemoteTMDB as TmdbRemoteMovie
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
 @Serializable
-data class RemoteMovie (
+data class RemoteOMDB (
     @SerialName("Title") val title: String,
     @SerialName("Plot") val plot : String ,
     @SerialName("Released") val  released : String ,

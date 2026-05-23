@@ -2,12 +2,12 @@ package edu.dyds.movies.commonFakes
 
 import edu.dyds.movies.data.external.MovieExternalSource
 import edu.dyds.movies.data.external.MoviesExternalSource
-import edu.dyds.movies.data.external.tmdb.RemoteMovie
+import edu.dyds.movies.data.external.tmdb.RemoteTMDB
 import edu.dyds.movies.data.external.tmdb.RemoteResult
 
 class FakeMoviesRemoteDataSource : MovieExternalSource, MoviesExternalSource {
     var remoteResult: RemoteResult? = null
-    var remoteMovie: RemoteMovie? = null
+    var remoteMovie: RemoteTMDB? = null
     var shouldThrow: Boolean = false
     var requestedMovieTitle: String? = null
 
@@ -16,7 +16,7 @@ class FakeMoviesRemoteDataSource : MovieExternalSource, MoviesExternalSource {
         return remoteResult ?: throw Exception("No remote result set")
     }
 
-    override suspend fun getMovieByTitle(title: String): RemoteMovie {
+    override suspend fun getMovieByTitle(title: String): RemoteTMDB {
         requestedMovieTitle = title
         if (shouldThrow) throw java.io.IOException("Remote error")
         return remoteMovie ?: throw Exception("No remote movie set")

@@ -2,7 +2,6 @@ package edu.dyds.movies.data.external.tmdb
 
 import edu.dyds.movies.data.external.MovieExternalSource
 import edu.dyds.movies.data.external.MoviesExternalSource
-import edu.dyds.movies.data.external.RemoteMovie
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

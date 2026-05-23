@@ -2,7 +2,7 @@ package edu.dyds.movies.commonFakes
 
 import edu.dyds.movies.data.external.MovieExternalSource
 import edu.dyds.movies.data.external.MoviesExternalSource
-import edu.dyds.movies.data.external.RemoteMovie
+import edu.dyds.movies.data.external.tmdb.RemoteMovie
 import edu.dyds.movies.data.external.tmdb.RemoteResult
 
 class FakeMoviesRemoteDataSource : MovieExternalSource, MoviesExternalSource {

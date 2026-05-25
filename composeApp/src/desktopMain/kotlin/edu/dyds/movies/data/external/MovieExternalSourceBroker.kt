@@ -9,7 +9,7 @@ import java.io.IOException
 class MovieExternalSourceBroker(
     private val tmdbMoviesExternalSourceProxy: TMDBMoviesExternalSourceProxy,
     private val omdbMoviesExternalSourceProxy: OMDBMoviesExternalSourceProxy
-) : MovieExternalSource, MoviesExternalSource {
+) : ExternalSource {
 
     override suspend fun getPopularMovies(): RemoteResult {
        return tmdbMoviesExternalSourceProxy.getPopularMovies()
@@ -28,7 +28,6 @@ class MovieExternalSourceBroker(
     }
 
     private fun buildMovie(tmdbMovie: RemoteTMDB, omdbMovie: RemoteTMDB): RemoteTMDB =
-        //Movie.MovieItem()
         tmdbMovie.copy(
             overview = "TMDB: ${tmdbMovie.overview}\n\nOMDB: ${omdbMovie.overview}",
             popularity = (omdbMovie.popularity + tmdbMovie.popularity) / 2.0,

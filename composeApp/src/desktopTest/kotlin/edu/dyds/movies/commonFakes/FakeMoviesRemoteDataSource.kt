@@ -1,11 +1,10 @@
 package edu.dyds.movies.commonFakes
 
-import edu.dyds.movies.data.external.MovieExternalSource
-import edu.dyds.movies.data.external.MoviesExternalSource
+import edu.dyds.movies.data.external.ExternalSource
 import edu.dyds.movies.data.external.tmdb.RemoteTMDB
 import edu.dyds.movies.data.external.tmdb.RemoteResult
 
-class FakeMoviesRemoteDataSource : MovieExternalSource, MoviesExternalSource {
+class FakeExternalSource : ExternalSource {
     var remoteResult: RemoteResult? = null
     var remoteMovie: RemoteTMDB? = null
     var shouldThrow: Boolean = false

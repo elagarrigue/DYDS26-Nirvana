@@ -1,7 +1,7 @@
 package edu.dyds.movies.data.repository
 
+import edu.dyds.movies.commonFakes.FakeExternalSource
 import edu.dyds.movies.commonFakes.FakeMoviesLocalDataSource
-import edu.dyds.movies.commonFakes.FakeMoviesRemoteDataSource
 import edu.dyds.movies.data.external.mapper.MovieMapper
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.data.external.tmdb.RemoteTMDB
@@ -10,19 +10,18 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.*
 
 class MoviesRepositoryImplTest {
-    private lateinit var remoteDataSource: FakeMoviesRemoteDataSource
+    private lateinit var remoteDataSource: FakeExternalSource
     private lateinit var localDataSource: FakeMoviesLocalDataSource
     private lateinit var movieMapper: MovieMapper
     private lateinit var repository: MoviesRepositoryImpl
 
     @BeforeTest
     fun setup() {
-        remoteDataSource = FakeMoviesRemoteDataSource()
+        remoteDataSource = FakeExternalSource()
         localDataSource = FakeMoviesLocalDataSource()
         movieMapper = MovieMapper()
         repository = MoviesRepositoryImpl(
-            moviesExternalSource = remoteDataSource,
-            movieExternalSource = remoteDataSource,
+            externalSource = remoteDataSource,
             localDataSource = localDataSource,
             movieMapper = movieMapper
         )

@@ -28,7 +28,7 @@ class MoviesRepositoryImpl(
     override suspend fun getMovieByTitle(title: String): Movie? {
         val remoteMovie = runCatching { movieExternalSource.getMovieByTitle(title) }.getOrNull()
         if (remoteMovie != null) {
-            return movieMapper.toDomainMovie(remoteMovie)
+            return remoteMovie
         }
 
         return localDataSource.getPopularMoviesFromCache()

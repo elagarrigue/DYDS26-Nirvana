@@ -2,6 +2,7 @@ package edu.dyds.movies.data.external.tmdb
 
 import edu.dyds.movies.data.external.MovieExternalSource
 import edu.dyds.movies.data.external.MovieExternalSourceBroker
+import edu.dyds.movies.domain.entity.Movie
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -27,7 +28,7 @@ class MovieExternalSourceBrokerTest {
 
     @Test
     fun `si la busqueda de pelicula por TMDB tiene exito y por OMBD falla, getMovieByTitle debe devolver el resultado de TMDB`() = runTest {
-        val tmdbMovie = createRemoteTMDB(title = "Inception")
+        val tmdbMovie = createMovie(title = "Inception")
         setupBroker(
             tmdbSource = mockk {
                 coEvery { getMovieByTitle("Inception") } returns tmdbMovie
@@ -45,7 +46,7 @@ class MovieExternalSourceBrokerTest {
 
     @Test
     fun `si la busqueda de pelicula por OMBD tiene exito y por TMBD falla, getMovieByTitle debe devolver el resultado de OMDB`() = runTest {
-        val omdbMovie = createRemoteTMDB(title = "Inception", overview = "OMDB synopsis")
+        val omdbMovie = createMovie(title = "Inception", overview = "OMDB synopsis")
         setupBroker(
             tmdbSource = mockk {
                 coEvery { getMovieByTitle("Inception") } returns null
@@ -63,13 +64,13 @@ class MovieExternalSourceBrokerTest {
 
     @Test
     fun `si la busqueda de pelicula por TMDB tiene exito y por OMBD tiene exito, getMovieByTitle debe devolver una fusion de ambas`() = runTest {
-        val tmdbMovie = createRemoteTMDB(
+        val tmdbMovie = createMovie(
             title = "Inception",
             overview = "TMDB overview",
             popularity = 8.5,
             voteAverage = 8.8
         )
-        val omdbMovie = createRemoteTMDB(
+        val omdbMovie = createMovie(
             title = "Inception",
             overview = "OMDB overview",
             popularity = 7.5,
@@ -127,24 +128,24 @@ class MovieExternalSourceBrokerTest {
         assertNull(result)
     }
 
-    private fun createRemoteTMDB(
+    private fun createMovie(
         id: Int = 1,
         title: String = "Test Movie",
         overview: String = "Test Overview",
         releaseDate: String = "2023-01-01",
-        posterPath: String? = "/poster.jpg",
-        backdropPath: String? = "/backdrop.jpg",
+        poster: String = "/poster.jpg",
+        backdrop: String? = "/backdrop.jpg",
         originalTitle: String = "Test Movie",
         originalLanguage: String = "en",
         popularity: Double = 8.0,
         voteAverage: Double = 8.0
-    ): RemoteTMDB = RemoteTMDB(
+    ): Movie = Movie(
         id = id,
         title = title,
         overview = overview,
         releaseDate = releaseDate,
-        posterPath = posterPath,
-        backdropPath = backdropPath,
+        poster = poster,
+        backdrop = backdrop,
         originalTitle = originalTitle,
         originalLanguage = originalLanguage,
         popularity = popularity,

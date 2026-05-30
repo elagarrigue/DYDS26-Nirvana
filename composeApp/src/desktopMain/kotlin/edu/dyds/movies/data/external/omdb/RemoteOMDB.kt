@@ -1,6 +1,6 @@
 package edu.dyds.movies.data.external.omdb
 
-import edu.dyds.movies.data.external.tmdb.RemoteTMDB as TmdbRemoteMovie
+import edu.dyds.movies.domain.entity.Movie
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
@@ -15,23 +15,23 @@ data class RemoteOMDB (
     @SerialName("Metascore") val  metaScore : String ,
     val imdbRating: String,
 ) {
-    fun toDomainMovie(): TmdbRemoteMovie {
+    fun toDomainMovie(): Movie {
         val imdb = imdbRating
             .takeIf { it.isNotEmpty() && it != "N/A" }
             ?.toDoubleOrNull() ?: 0.0
         val vote = if (metaScore.isNotEmpty() && metaScore != "N/A") metaScore.toDouble() else 0.0
 
-        return TmdbRemoteMovie(
+        return Movie(
             id = title.hashCode(),
             title = title,
             overview = plot,
             releaseDate = if (released.isNotEmpty() && released != "N/A") released else year,
-            posterPath = poster,
-            backdropPath = poster,
+            poster = poster,
+            backdrop = poster,
             originalTitle = title,
             originalLanguage = language,
             popularity = imdb,
-            voteAverage = if (metaScore.isNotEmpty() && metaScore != "N/A") metaScore.toDouble() else 0.0,
+            voteAverage = vote
         )
     }
 }

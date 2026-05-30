@@ -1,13 +1,13 @@
 package edu.dyds.movies.data.external
 
-import edu.dyds.movies.data.external.tmdb.RemoteTMDB
+import edu.dyds.movies.domain.entity.Movie
 
 class MovieExternalSourceBroker(
     private val tmdbMoviesExternalSource: MovieExternalSource,
     private val omdbMoviesExternalSource: MovieExternalSource
 ) : MovieExternalSource {
 
-    override suspend fun getMovieByTitle(title: String): RemoteTMDB? {
+    override suspend fun getMovieByTitle(title: String): Movie? {
         val tmdbMovie = runCatching { tmdbMoviesExternalSource.getMovieByTitle(title) }.getOrNull()
         val omdbMovie = runCatching { omdbMoviesExternalSource.getMovieByTitle(title) }.getOrNull()
 
@@ -19,10 +19,10 @@ class MovieExternalSourceBroker(
         }
     }
 
-    private fun withOverviewPrefix(prefix: String, movie: RemoteTMDB): RemoteTMDB =
+    private fun withOverviewPrefix(prefix: String, movie: Movie): Movie =
         movie.copy(overview = "$prefix: ${movie.overview}")
 
-    private fun buildMovie(tmdbMovie: RemoteTMDB, omdbMovie: RemoteTMDB): RemoteTMDB =
+    private fun buildMovie(tmdbMovie: Movie, omdbMovie: Movie): Movie =
         tmdbMovie.copy(
             overview = "TMDB: ${tmdbMovie.overview}\n\nOMDB: ${omdbMovie.overview}",
             popularity = (omdbMovie.popularity + tmdbMovie.popularity) / 2.0,

@@ -58,11 +58,11 @@ class MoviesRepositoryImplTest {
 
     @Test
     fun `dado que remoto tiene datos de la película, al llamar a getMovieByTitle, devuelve los detalles de la película desde remote si están disponibles`() = runBlocking {
-        val remoteMovie = RemoteTMDB(2, "title2", "overview2", "2020-02-02", "/poster2.jpg", null, "originalTitle2", "es", 2.0, 7.0)
+        val remoteMovie = Movie(2, "title2", "overview2", "2020-02-02", "poster2", null, "originalTitle2", "es", 2.0, 7.0)
         movieExternalSource.remoteMovie = remoteMovie
         val result = repository.getMovieByTitle("title2")
         assertNotNull(result)
-        assertEquals(remoteMovie.id, result.id)
+        assertEquals(remoteMovie, result)
     }
 
     @Test

@@ -2,6 +2,7 @@ package edu.dyds.movies.data.external.tmdb
 
 import edu.dyds.movies.data.external.MovieExternalSource
 import edu.dyds.movies.data.external.MoviesExternalSource
+import edu.dyds.movies.domain.entity.Movie
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -12,8 +13,8 @@ class TMDBMoviesExternalSource(
     override suspend fun getPopularMovies(): RemoteResult =
         httpClient.get("/3/discover/movie?sort_by=popularity.desc").body()
 
-    override suspend fun getMovieByTitle(title: String): RemoteTMDB? =
+    override suspend fun getMovieByTitle(title: String): Movie? =
         httpClient.get("/3/search/movie") {
             parameter("query", title)
-        }.body<RemoteResult>().results.firstOrNull()
+        }.body<RemoteResult>().results.firstOrNull()?.let { MovieMapper().toDomainMovie(it) }
 }

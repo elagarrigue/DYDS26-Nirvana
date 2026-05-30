@@ -2,7 +2,7 @@ package edu.dyds.movies.data.repository
 
 import edu.dyds.movies.commonFakes.FakeExternalSource
 import edu.dyds.movies.commonFakes.FakeMoviesLocalDataSource
-import edu.dyds.movies.data.external.mapper.MovieMapper
+import edu.dyds.movies.data.external.tmdb.MovieMapper
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.data.external.tmdb.RemoteTMDB
 import edu.dyds.movies.data.external.tmdb.RemoteResult

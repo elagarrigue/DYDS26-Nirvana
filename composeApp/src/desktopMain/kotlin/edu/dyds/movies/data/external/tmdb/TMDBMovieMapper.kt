@@ -1,6 +1,5 @@
-package edu.dyds.movies.data.external.mapper
+package edu.dyds.movies.data.external.tmdb
 
-import edu.dyds.movies.data.external.tmdb.RemoteTMDB
 import edu.dyds.movies.domain.entity.Movie
 
 private const val POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185"

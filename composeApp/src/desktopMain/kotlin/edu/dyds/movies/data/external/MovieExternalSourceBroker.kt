@@ -3,9 +3,9 @@ package edu.dyds.movies.data.external
 import edu.dyds.movies.domain.entity.Movie
 
 class MovieExternalSourceBroker(
-    private val tmdbMoviesExternalSource: MovieExternalSource,
-    private val omdbMoviesExternalSource: MovieExternalSource
-) : MovieExternalSource {
+    private val tmdbMoviesExternalSource: MovieDetailExternalSource,
+    private val omdbMoviesExternalSource: MovieDetailExternalSource
+) : MovieDetailExternalSource {
 
     override suspend fun getMovieByTitle(title: String): Movie? {
         val tmdbMovie = runCatching { tmdbMoviesExternalSource.getMovieByTitle(title) }.getOrNull()
@@ -13,20 +13,25 @@ class MovieExternalSourceBroker(
 
         return when {
             tmdbMovie != null && omdbMovie != null -> buildMovie(tmdbMovie, omdbMovie)
-            tmdbMovie != null -> withOverviewPrefix("TMDB", tmdbMovie)
-            omdbMovie != null -> withOverviewPrefix("OMDB", omdbMovie)
+            tmdbMovie != null -> buildOnlyTMDBMovie(tmdbMovie)
+            omdbMovie != null -> buildOnlyOMDBMovie(omdbMovie)
             else -> null
         }
     }
 
-    private fun withOverviewPrefix(prefix: String, movie: Movie): Movie =
-        movie.copy(overview = "$prefix: ${movie.overview}")
-
-    private fun buildMovie(tmdbMovie: Movie, omdbMovie: Movie): Movie =
-        tmdbMovie.copy(
+    private fun buildMovie(tmdbMovie: Movie, omdbMovie: Movie): Movie {
+        return tmdbMovie.copy(
             overview = "TMDB: ${tmdbMovie.overview}\n\nOMDB: ${omdbMovie.overview}",
             popularity = (omdbMovie.popularity + tmdbMovie.popularity) / 2.0,
             voteAverage = (omdbMovie.voteAverage + tmdbMovie.voteAverage) / 2.0
         )
+    }
 
+    private fun buildOnlyOMDBMovie(movie: Movie): Movie {
+        return movie.copy(overview = "OMDB: ${movie.overview}")
+    }
+
+    private fun buildOnlyTMDBMovie(movie: Movie): Movie {
+        return movie.copy(overview = "TMDB: ${movie.overview}")
+    }
 }

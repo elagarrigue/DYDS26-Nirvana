@@ -1,10 +1,10 @@
 package edu.dyds.movies.commonFakes
 
-import edu.dyds.movies.data.external.MovieExternalSource
-import edu.dyds.movies.data.external.MoviesExternalSource
+import edu.dyds.movies.data.external.MovieDetailExternalSource
+import edu.dyds.movies.data.external.PopularMoviesExternalSource
 import edu.dyds.movies.domain.entity.Movie
 
-class FakeMoviesExternalSource : MoviesExternalSource {
+class FakeMoviesExternalSource : PopularMoviesExternalSource {
     var remoteMovies: List<Movie>? = null
     var shouldThrow: Boolean = false
 
@@ -14,7 +14,7 @@ class FakeMoviesExternalSource : MoviesExternalSource {
     }
 }
 
-class FakeMovieExternalSource : MovieExternalSource {
+class FakeMovieExternalSource : MovieDetailExternalSource {
     var remoteMovie: Movie? = null
     var shouldThrow: Boolean = false
     var requestedMovieTitle: String? = null

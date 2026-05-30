@@ -2,7 +2,6 @@ package edu.dyds.movies.di
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import edu.dyds.movies.data.external.tmdb.MovieMapper
 import edu.dyds.movies.domain.qualifier.MovieQualifier
 import edu.dyds.movies.data.repository.MoviesRepositoryImpl
 import edu.dyds.movies.data.local.MoviesLocalDataSourceImpl
@@ -77,14 +76,12 @@ object MoviesDependencyInjector {
         omdbMoviesExternalSource = omdbExternalSourceProxy
     )
     private val localDataSource = MoviesLocalDataSourceImpl()
-    private val movieMapper = MovieMapper()
     private val movieQualifier = MovieQualifier()
 
     private val moviesRepository = MoviesRepositoryImpl(
         movieExternalSource = movieExternalSourceBroker,
         moviesExternalSource = remoteDataSource,
-        localDataSource = localDataSource,
-        movieMapper = movieMapper
+        localDataSource = localDataSource
     )
 
     private val getMovieDetailsUseCase: GetMovieDetailsUseCase = GetMovieDetailsUseCaseImpl(moviesRepository)

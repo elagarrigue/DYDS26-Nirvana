@@ -3,10 +3,7 @@ package edu.dyds.movies.data.repository
 import edu.dyds.movies.commonFakes.FakeMovieExternalSource
 import edu.dyds.movies.commonFakes.FakeMoviesExternalSource
 import edu.dyds.movies.commonFakes.FakeMoviesLocalDataSource
-import edu.dyds.movies.data.external.tmdb.MovieMapper
 import edu.dyds.movies.domain.entity.Movie
-import edu.dyds.movies.data.external.tmdb.RemoteTMDB
-import edu.dyds.movies.data.external.tmdb.RemoteResult
 import kotlinx.coroutines.runBlocking
 import kotlin.test.*
 
@@ -14,7 +11,6 @@ class MoviesRepositoryImplTest {
     private lateinit var movieExternalSource: FakeMovieExternalSource
     private lateinit var moviesExternalSource: FakeMoviesExternalSource
     private lateinit var localDataSource: FakeMoviesLocalDataSource
-    private lateinit var movieMapper: MovieMapper
     private lateinit var repository: MoviesRepositoryImpl
 
     @BeforeTest
@@ -22,12 +18,10 @@ class MoviesRepositoryImplTest {
         movieExternalSource = FakeMovieExternalSource()
         moviesExternalSource = FakeMoviesExternalSource()
         localDataSource = FakeMoviesLocalDataSource()
-        movieMapper = MovieMapper()
         repository = MoviesRepositoryImpl(
             movieExternalSource = movieExternalSource,
             moviesExternalSource = moviesExternalSource,
-            localDataSource = localDataSource,
-            movieMapper = movieMapper
+            localDataSource = localDataSource
         )
     }
 
@@ -42,18 +36,13 @@ class MoviesRepositoryImplTest {
     @Test
     fun `realiza búsquedas desde el servidor remoto y almacena en caché, si la caché está vacía`() = runBlocking {
         localDataSource.cachedMovies = emptyList()
-        val remoteMovie = RemoteTMDB(1, "title", "overview", "2020-01-01", "/poster.jpg", null, "originalTitle", "en", 1.0, 8.0)
-        moviesExternalSource.remoteResult = RemoteResult(
-            page = 1,
-            results = listOf(remoteMovie),
-            totalPages = 1,
-            totalResults = 1
-        )
+        val remoteMovie = Movie(1, "title", "overview", "2020-01-01", "poster", null, "originalTitle", "en", 1.0, 8.0)
+        moviesExternalSource.remoteMovies = listOf(remoteMovie)
         val result = repository.getPopularMovies()
         assertEquals(1, result.size)
         assertEquals("title", result[0].title)
         assertEquals(remoteMovie.id, result[0].id)
-        assertEquals(listOf(movieMapper.toDomainMovie(remoteMovie)), localDataSource.savedMovies)
+        assertEquals(listOf(remoteMovie), localDataSource.savedMovies)
     }
 
     @Test

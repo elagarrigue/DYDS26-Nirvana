@@ -2,7 +2,6 @@ package edu.dyds.movies.data.external.proxy
 
 import edu.dyds.movies.data.external.MovieExternalSource
 import edu.dyds.movies.data.external.MoviesExternalSource
-import edu.dyds.movies.data.external.tmdb.RemoteResult
 import edu.dyds.movies.domain.entity.Movie
 
 class TMDBMoviesExternalSourceProxy(
@@ -12,6 +11,6 @@ class TMDBMoviesExternalSourceProxy(
     override suspend fun getMovieByTitle(title: String): Movie? =
         tmdbMoviesExternalSource.getMovieByTitle(title)
 
-    suspend fun getPopularMovies(): RemoteResult =
+    suspend fun getPopularMovies(): List<Movie> =
         tmdbMoviesListExternalSource.getPopularMovies()
 }

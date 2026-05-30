@@ -5,17 +5,17 @@ import edu.dyds.movies.domain.entity.Movie
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import edu.dyds.movies.data.external.omdb.RemoteOMDB as OmdbRemoteMovie
 
 class OMDBMoviesExternalSource(
     private val omdbHttpClient: HttpClient,
+    private val movieMapper: OmdbMovieMapper = OmdbMovieMapper(),
 ) : MovieExternalSource {
     override suspend fun getMovieByTitle(title: String): Movie? {
-        return runCatching { getOMDBMovieDetails(title).toDomainMovie() }.getOrNull()
+        return runCatching { movieMapper.toDomainMovie(getOMDBMovieDetails(title)) }.getOrNull()
     }
 
-    private suspend fun getOMDBMovieDetails(title: String): OmdbRemoteMovie =
+    private suspend fun getOMDBMovieDetails(title: String): RemoteOMDB =
         omdbHttpClient.get("/?t=") {
             parameter("t", title)
-        }.body<OmdbRemoteMovie>()
+        }.body<RemoteOMDB>()
 }

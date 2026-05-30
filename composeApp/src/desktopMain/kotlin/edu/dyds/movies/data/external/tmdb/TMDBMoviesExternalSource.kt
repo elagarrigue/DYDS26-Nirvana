@@ -8,13 +8,17 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 
 class TMDBMoviesExternalSource(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val movieMapper: MovieMapper = MovieMapper()
 ) : MovieExternalSource, MoviesExternalSource {
-    override suspend fun getPopularMovies(): RemoteResult =
-        httpClient.get("/3/discover/movie?sort_by=popularity.desc").body()
+    override suspend fun getPopularMovies(): List<Movie> =
+        httpClient.get("/3/discover/movie?sort_by=popularity.desc")
+            .body<RemoteResult>()
+            .results
+            .map(movieMapper::toDomainMovie)
 
     override suspend fun getMovieByTitle(title: String): Movie? =
         httpClient.get("/3/search/movie") {
             parameter("query", title)
-        }.body<RemoteResult>().results.firstOrNull()?.let { MovieMapper().toDomainMovie(it) }
+        }.body<RemoteResult>().results.firstOrNull()?.let { movieMapper.toDomainMovie(it) }
 }

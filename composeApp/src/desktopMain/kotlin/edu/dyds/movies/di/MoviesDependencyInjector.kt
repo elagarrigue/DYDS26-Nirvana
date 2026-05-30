@@ -81,7 +81,8 @@ object MoviesDependencyInjector {
     private val movieQualifier = MovieQualifier()
 
     private val moviesRepository = MoviesRepositoryImpl(
-        externalSource = movieExternalSourceBroker,
+        movieExternalSource = movieExternalSourceBroker,
+        moviesExternalSource = remoteDataSource,
         localDataSource = localDataSource,
         movieMapper = movieMapper
     )

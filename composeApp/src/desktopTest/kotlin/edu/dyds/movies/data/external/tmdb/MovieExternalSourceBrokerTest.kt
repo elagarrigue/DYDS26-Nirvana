@@ -26,17 +26,6 @@ class MovieExternalSourceBrokerTest {
         this.broker = MovieExternalSourceBroker(tmdbProxy, omdbProxy)
     }
 
-    @Test
-    fun `si llamamos a getPopularMovies, el broker debe devolver un resultado de TMDB proxy`() = runTest {
-        val mockResult = mockk<RemoteResult>()
-        setupBroker(tmdbProxy = mockk {
-            coEvery { getPopularMovies() } returns mockResult
-        })
-
-        val result = broker.getPopularMovies()
-
-        assertEquals(mockResult, result)
-    }
 
     @Test
     fun `si la busqueda de pelicula por TMDB tiene exito y por OMBD falla, getMovieByTitle debe devolver el resultado de TMDB`() = runTest {

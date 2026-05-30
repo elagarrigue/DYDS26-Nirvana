@@ -3,17 +3,12 @@ package edu.dyds.movies.data.external
 import edu.dyds.movies.data.external.proxy.OMDBMoviesExternalSourceProxy
 import edu.dyds.movies.data.external.proxy.TMDBMoviesExternalSourceProxy
 import edu.dyds.movies.data.external.tmdb.RemoteTMDB
-import edu.dyds.movies.data.external.tmdb.RemoteResult
 import java.io.IOException
 
 class MovieExternalSourceBroker(
     private val tmdbMoviesExternalSourceProxy: TMDBMoviesExternalSourceProxy,
     private val omdbMoviesExternalSourceProxy: OMDBMoviesExternalSourceProxy
-) : ExternalSource {
-
-    override suspend fun getPopularMovies(): RemoteResult {
-       return tmdbMoviesExternalSourceProxy.getPopularMovies()
-    }
+) : MovieExternalSource {
 
     override suspend fun getMovieByTitle(title: String): RemoteTMDB {
         val tmdbMovie = runCatching { tmdbMoviesExternalSourceProxy.getMovieByTitle(title) }.getOrNull()

@@ -1,6 +1,7 @@
 package edu.dyds.movies.data.repository
 
-import edu.dyds.movies.commonFakes.FakeExternalSource
+import edu.dyds.movies.commonFakes.FakeMovieExternalSource
+import edu.dyds.movies.commonFakes.FakeMoviesExternalSource
 import edu.dyds.movies.commonFakes.FakeMoviesLocalDataSource
 import edu.dyds.movies.data.external.tmdb.MovieMapper
 import edu.dyds.movies.domain.entity.Movie
@@ -10,18 +11,21 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.*
 
 class MoviesRepositoryImplTest {
-    private lateinit var remoteDataSource: FakeExternalSource
+    private lateinit var movieExternalSource: FakeMovieExternalSource
+    private lateinit var moviesExternalSource: FakeMoviesExternalSource
     private lateinit var localDataSource: FakeMoviesLocalDataSource
     private lateinit var movieMapper: MovieMapper
     private lateinit var repository: MoviesRepositoryImpl
 
     @BeforeTest
     fun setup() {
-        remoteDataSource = FakeExternalSource()
+        movieExternalSource = FakeMovieExternalSource()
+        moviesExternalSource = FakeMoviesExternalSource()
         localDataSource = FakeMoviesLocalDataSource()
         movieMapper = MovieMapper()
         repository = MoviesRepositoryImpl(
-            externalSource = remoteDataSource,
+            movieExternalSource = movieExternalSource,
+            moviesExternalSource = moviesExternalSource,
             localDataSource = localDataSource,
             movieMapper = movieMapper
         )
@@ -39,7 +43,7 @@ class MoviesRepositoryImplTest {
     fun `realiza búsquedas desde el servidor remoto y almacena en caché, si la caché está vacía`() = runBlocking {
         localDataSource.cachedMovies = emptyList()
         val remoteMovie = RemoteTMDB(1, "title", "overview", "2020-01-01", "/poster.jpg", null, "originalTitle", "en", 1.0, 8.0)
-        remoteDataSource.remoteResult = RemoteResult(
+        moviesExternalSource.remoteResult = RemoteResult(
             page = 1,
             results = listOf(remoteMovie),
             totalPages = 1,
@@ -55,7 +59,7 @@ class MoviesRepositoryImplTest {
     @Test
     fun `dado que remoto tiene datos de la película, al llamar a getMovieByTitle, devuelve los detalles de la película desde remote si están disponibles`() = runBlocking {
         val remoteMovie = RemoteTMDB(2, "title2", "overview2", "2020-02-02", "/poster2.jpg", null, "originalTitle2", "es", 2.0, 7.0)
-        remoteDataSource.remoteMovie = remoteMovie
+        movieExternalSource.remoteMovie = remoteMovie
         val result = repository.getMovieByTitle("title2")
         assertNotNull(result)
         assertEquals(remoteMovie.id, result.id)
@@ -63,7 +67,7 @@ class MoviesRepositoryImplTest {
 
     @Test
     fun `en caso de error remoto, se recurre a la caché local`() = runBlocking {
-        remoteDataSource.shouldThrow = true
+        movieExternalSource.shouldThrow = true
         val cachedMovie = Movie(3, "title3", "overview3", "2020-03-03", "poster3", null, "originalTitle3", "fr", 3.0, 6.0)
         localDataSource.cachedMovies = listOf(cachedMovie)
         val result = repository.getMovieByTitle("title3")
@@ -72,7 +76,7 @@ class MoviesRepositoryImplTest {
 
     @Test
     fun `si falla omdb y la cache esta vacia, getMovieByTitle devuelve null`() = runBlocking {
-        remoteDataSource.shouldThrow = true
+        movieExternalSource.shouldThrow = true
         localDataSource.cachedMovies = emptyList()
 
         val result = repository.getMovieByTitle("Unknown")

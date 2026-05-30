@@ -33,7 +33,7 @@ class MovieExternalSourceBrokerTest {
                 coEvery { getMovieByTitle("Inception") } returns tmdbMovie
             },
             omdbSource = mockk {
-                coEvery { getMovieByTitle("Inception") } throws Exception("OMDB error")
+                coEvery { getMovieByTitle("Inception") } returns null
             }
         )
 
@@ -48,7 +48,7 @@ class MovieExternalSourceBrokerTest {
         val omdbMovie = createRemoteTMDB(title = "Inception", overview = "OMDB synopsis")
         setupBroker(
             tmdbSource = mockk {
-                coEvery { getMovieByTitle("Inception") } throws Exception("TMDB error")
+                coEvery { getMovieByTitle("Inception") } returns null
             },
             omdbSource = mockk {
                 coEvery { getMovieByTitle("Inception") } returns omdbMovie
@@ -100,14 +100,30 @@ class MovieExternalSourceBrokerTest {
     fun `si la busqueda de pelicula por TMDB falla y por OMDB falla, getMovieByTitle devuelve null`() = runTest {
         setupBroker(
             tmdbSource = mockk {
-                coEvery { getMovieByTitle("Unknown") } throws Exception("TMDB error")
+                coEvery { getMovieByTitle("Unknown") } returns null
             },
             omdbSource = mockk {
-                coEvery { getMovieByTitle("Unknown") } throws Exception("OMDB error")
+                coEvery { getMovieByTitle("Unknown") } returns null
             }
         )
 
         val result = broker.getMovieByTitle("Unknown")
+        assertNull(result)
+    }
+
+    @Test
+    fun `si la busqueda de pelicula por TMDB devuelve null y por OMDB devuelve null, getMovieByTitle devuelve null`() = runTest {
+        setupBroker(
+            tmdbSource = mockk {
+                coEvery { getMovieByTitle("Unknown") } returns null
+            },
+            omdbSource = mockk {
+                coEvery { getMovieByTitle("Unknown") } returns null
+            }
+        )
+
+        val result = broker.getMovieByTitle("Unknown")
+
         assertNull(result)
     }
 

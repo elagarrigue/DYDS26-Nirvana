@@ -73,8 +73,8 @@ object MoviesDependencyInjector {
     )
     private val omdbExternalSourceProxy = OMDBMoviesExternalSourceProxy(omdbDataSource)
     private val movieExternalSourceBroker = MovieExternalSourceBroker(
-        tmdbMoviesExternalSourceProxy = tmdbExternalSourceProxy,
-        omdbMoviesExternalSourceProxy = omdbExternalSourceProxy
+        tmdbMoviesExternalSource = tmdbExternalSourceProxy,
+        omdbMoviesExternalSource = omdbExternalSourceProxy
     )
     private val localDataSource = MoviesLocalDataSourceImpl()
     private val movieMapper = MovieMapper()

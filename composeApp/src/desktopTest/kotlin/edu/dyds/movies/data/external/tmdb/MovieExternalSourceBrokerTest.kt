@@ -1,8 +1,7 @@
 package edu.dyds.movies.data.external.tmdb
 
+import edu.dyds.movies.data.external.MovieExternalSource
 import edu.dyds.movies.data.external.MovieExternalSourceBroker
-import edu.dyds.movies.data.external.proxy.OMDBMoviesExternalSourceProxy
-import edu.dyds.movies.data.external.proxy.TMDBMoviesExternalSourceProxy
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -12,17 +11,17 @@ import kotlin.test.assertNull
 
 class MovieExternalSourceBrokerTest {
 
-    private lateinit var tmdbProxy: TMDBMoviesExternalSourceProxy
-    private lateinit var omdbProxy: OMDBMoviesExternalSourceProxy
+    private lateinit var tmdbSource: MovieExternalSource
+    private lateinit var omdbSource: MovieExternalSource
     private lateinit var broker: MovieExternalSourceBroker
 
     private fun setupBroker(
-        tmdbProxy: TMDBMoviesExternalSourceProxy = mockk(),
-        omdbProxy: OMDBMoviesExternalSourceProxy = mockk()
+        tmdbSource: MovieExternalSource = mockk(),
+        omdbSource: MovieExternalSource = mockk()
     ) {
-        this.tmdbProxy = tmdbProxy
-        this.omdbProxy = omdbProxy
-        this.broker = MovieExternalSourceBroker(tmdbProxy, omdbProxy)
+        this.tmdbSource = tmdbSource
+        this.omdbSource = omdbSource
+        this.broker = MovieExternalSourceBroker(tmdbSource, omdbSource)
     }
 
 
@@ -30,10 +29,10 @@ class MovieExternalSourceBrokerTest {
     fun `si la busqueda de pelicula por TMDB tiene exito y por OMBD falla, getMovieByTitle debe devolver el resultado de TMDB`() = runTest {
         val tmdbMovie = createRemoteTMDB(title = "Inception")
         setupBroker(
-            tmdbProxy = mockk {
+            tmdbSource = mockk {
                 coEvery { getMovieByTitle("Inception") } returns tmdbMovie
             },
-            omdbProxy = mockk {
+            omdbSource = mockk {
                 coEvery { getMovieByTitle("Inception") } throws Exception("OMDB error")
             }
         )
@@ -48,10 +47,10 @@ class MovieExternalSourceBrokerTest {
     fun `si la busqueda de pelicula por OMBD tiene exito y por TMBD falla, getMovieByTitle debe devolver el resultado de OMDB`() = runTest {
         val omdbMovie = createRemoteTMDB(title = "Inception", overview = "OMDB synopsis")
         setupBroker(
-            tmdbProxy = mockk {
+            tmdbSource = mockk {
                 coEvery { getMovieByTitle("Inception") } throws Exception("TMDB error")
             },
-            omdbProxy = mockk {
+            omdbSource = mockk {
                 coEvery { getMovieByTitle("Inception") } returns omdbMovie
             }
         )
@@ -78,10 +77,10 @@ class MovieExternalSourceBrokerTest {
         )
 
         setupBroker(
-            tmdbProxy = mockk {
+            tmdbSource = mockk {
                 coEvery { getMovieByTitle("Inception") } returns tmdbMovie
             },
-            omdbProxy = mockk {
+            omdbSource = mockk {
                 coEvery { getMovieByTitle("Inception") } returns omdbMovie
             }
         )
@@ -100,10 +99,10 @@ class MovieExternalSourceBrokerTest {
     @Test
     fun `si la busqueda de pelicula por TMDB falla y por OMDB falla, getMovieByTitle devuelve null`() = runTest {
         setupBroker(
-            tmdbProxy = mockk {
+            tmdbSource = mockk {
                 coEvery { getMovieByTitle("Unknown") } throws Exception("TMDB error")
             },
-            omdbProxy = mockk {
+            omdbSource = mockk {
                 coEvery { getMovieByTitle("Unknown") } throws Exception("OMDB error")
             }
         )

@@ -1,17 +1,15 @@
 package edu.dyds.movies.data.external
 
-import edu.dyds.movies.data.external.proxy.OMDBMoviesExternalSourceProxy
-import edu.dyds.movies.data.external.proxy.TMDBMoviesExternalSourceProxy
 import edu.dyds.movies.data.external.tmdb.RemoteTMDB
 
 class MovieExternalSourceBroker(
-    private val tmdbMoviesExternalSourceProxy: TMDBMoviesExternalSourceProxy,
-    private val omdbMoviesExternalSourceProxy: OMDBMoviesExternalSourceProxy
+    private val tmdbMoviesExternalSource: MovieExternalSource,
+    private val omdbMoviesExternalSource: MovieExternalSource
 ) : MovieExternalSource {
 
     override suspend fun getMovieByTitle(title: String): RemoteTMDB? {
-        val tmdbMovie = runCatching { tmdbMoviesExternalSourceProxy.getMovieByTitle(title) }.getOrNull()
-        val omdbMovie = runCatching { omdbMoviesExternalSourceProxy.getMovieByTitle(title) }.getOrNull()
+        val tmdbMovie = runCatching { tmdbMoviesExternalSource.getMovieByTitle(title) }.getOrNull()
+        val omdbMovie = runCatching { omdbMoviesExternalSource.getMovieByTitle(title) }.getOrNull()
 
         return when {
             tmdbMovie != null && omdbMovie != null -> buildMovie(tmdbMovie, omdbMovie)

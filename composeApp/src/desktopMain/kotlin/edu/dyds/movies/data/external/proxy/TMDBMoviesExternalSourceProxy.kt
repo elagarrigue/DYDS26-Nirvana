@@ -9,7 +9,7 @@ class TMDBMoviesExternalSourceProxy(
     private val tmdbMoviesExternalSource: MovieExternalSource,
     private val tmdbMoviesListExternalSource: MoviesExternalSource,
 ) : MovieExternalSource {
-    override suspend fun getMovieByTitle(title: String): RemoteTMDB =
+    override suspend fun getMovieByTitle(title: String): RemoteTMDB? =
         tmdbMoviesExternalSource.getMovieByTitle(title)
 
     suspend fun getPopularMovies(): RemoteResult =

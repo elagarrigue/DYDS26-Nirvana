@@ -12,8 +12,8 @@ class TMDBMoviesExternalSource(
     override suspend fun getPopularMovies(): RemoteResult =
         httpClient.get("/3/discover/movie?sort_by=popularity.desc").body()
 
-    override suspend fun getMovieByTitle(title: String): RemoteTMDB =
+    override suspend fun getMovieByTitle(title: String): RemoteTMDB? =
         httpClient.get("/3/search/movie") {
             parameter("query", title)
-        }.body<RemoteResult>().results.first()
+        }.body<RemoteResult>().results.firstOrNull()
 }

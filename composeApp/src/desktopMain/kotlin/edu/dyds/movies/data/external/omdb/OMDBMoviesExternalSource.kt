@@ -10,8 +10,8 @@ import edu.dyds.movies.data.external.omdb.RemoteOMDB as OmdbRemoteMovie
 class OMDBMoviesExternalSource(
     private val omdbHttpClient: HttpClient,
 ) : MovieExternalSource {
-    override suspend fun getMovieByTitle(title: String): RemoteTMDB {
-        return getOMDBMovieDetails(title).toDomainMovie()
+    override suspend fun getMovieByTitle(title: String): RemoteTMDB? {
+        return runCatching { getOMDBMovieDetails(title).toDomainMovie() }.getOrNull()
     }
 
     private suspend fun getOMDBMovieDetails(title: String): OmdbRemoteMovie =

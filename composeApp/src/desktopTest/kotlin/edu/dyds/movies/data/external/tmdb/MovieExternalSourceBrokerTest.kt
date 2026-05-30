@@ -6,10 +6,9 @@ import edu.dyds.movies.data.external.proxy.TMDBMoviesExternalSourceProxy
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import java.io.IOException
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 class MovieExternalSourceBrokerTest {
 
@@ -41,7 +40,8 @@ class MovieExternalSourceBrokerTest {
 
         val result = broker.getMovieByTitle("Inception")
 
-        assertEquals(tmdbMovie, result)
+        val expected = tmdbMovie.copy(overview = "TMDB: ${tmdbMovie.overview}")
+        assertEquals(expected, result)
     }
 
     @Test
@@ -58,7 +58,8 @@ class MovieExternalSourceBrokerTest {
 
         val result = broker.getMovieByTitle("Inception")
 
-        assertEquals(omdbMovie, result)
+        val expected = omdbMovie.copy(overview = "OMDB: ${omdbMovie.overview}")
+        assertEquals(expected, result)
     }
 
     @Test
@@ -85,7 +86,7 @@ class MovieExternalSourceBrokerTest {
             }
         )
 
-        val result = broker.getMovieByTitle("Inception")
+        val result = requireNotNull(broker.getMovieByTitle("Inception"))
 
         val expectedOverview = "TMDB: TMDB overview\n\nOMDB: OMDB overview"
         val expectedPopularity = 8.0
@@ -97,7 +98,7 @@ class MovieExternalSourceBrokerTest {
     }
 
     @Test
-    fun `si la busqueda de pelicula por TMDB falla y por OMDB falla, getMovieByTitle debe tirar IOException`() = runTest {
+    fun `si la busqueda de pelicula por TMDB falla y por OMDB falla, getMovieByTitle devuelve null`() = runTest {
         setupBroker(
             tmdbProxy = mockk {
                 coEvery { getMovieByTitle("Unknown") } throws Exception("TMDB error")
@@ -107,9 +108,8 @@ class MovieExternalSourceBrokerTest {
             }
         )
 
-        assertFailsWith<IOException> {
-            broker.getMovieByTitle("Unknown")
-        }
+        val result = broker.getMovieByTitle("Unknown")
+        assertNull(result)
     }
 
     private fun createRemoteTMDB(

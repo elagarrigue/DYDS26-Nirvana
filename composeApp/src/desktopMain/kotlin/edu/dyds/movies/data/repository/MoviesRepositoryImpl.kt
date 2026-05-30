@@ -6,7 +6,6 @@ import edu.dyds.movies.data.external.MoviesExternalSource
 import edu.dyds.movies.data.external.tmdb.MovieMapper
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.repository.MoviesRepository
-import java.io.IOException
 
 class MoviesRepositoryImpl(
     private val movieExternalSource: MovieExternalSource,
@@ -27,12 +26,12 @@ class MoviesRepositoryImpl(
     }
 
     override suspend fun getMovieByTitle(title: String): Movie? {
-        return try {
-            val remoteMovie = movieExternalSource.getMovieByTitle(title)
-            movieMapper.toDomainMovie(remoteMovie)
-        } catch (e: IOException) {
-            localDataSource.getPopularMoviesFromCache()
-                .find { it.title.equals(title, ignoreCase = true) }
+        val remoteMovie = runCatching { movieExternalSource.getMovieByTitle(title) }.getOrNull()
+        if (remoteMovie != null) {
+            return movieMapper.toDomainMovie(remoteMovie)
         }
+
+        return localDataSource.getPopularMoviesFromCache()
+            .find { it.title.equals(title, ignoreCase = true) }
     }
 }

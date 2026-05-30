@@ -20,9 +20,9 @@ class FakeMovieExternalSource : MovieExternalSource {
     var shouldThrow: Boolean = false
     var requestedMovieTitle: String? = null
 
-    override suspend fun getMovieByTitle(title: String): RemoteTMDB {
+    override suspend fun getMovieByTitle(title: String): RemoteTMDB? {
         requestedMovieTitle = title
         if (shouldThrow) throw java.io.IOException("Remote error")
-        return remoteMovie ?: throw Exception("No remote movie set")
+        return remoteMovie
     }
 }

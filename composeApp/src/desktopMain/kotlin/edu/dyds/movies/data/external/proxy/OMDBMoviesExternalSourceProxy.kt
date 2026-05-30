@@ -6,6 +6,6 @@ import edu.dyds.movies.data.external.tmdb.RemoteTMDB
 class OMDBMoviesExternalSourceProxy(
     private val omdbMoviesExternalSource: MovieExternalSource,
 ) : MovieExternalSource {
-    override suspend fun getMovieByTitle(title: String): RemoteTMDB =
+    override suspend fun getMovieByTitle(title: String): RemoteTMDB? =
         omdbMoviesExternalSource.getMovieByTitle(title)
 }

@@ -2,8 +2,11 @@ package edu.dyds.movies.domain.usecase
 
 import edu.dyds.movies.domain.entity.QualifiedMovie
 import edu.dyds.movies.domain.qualifier.MovieQualifier
-import edu.dyds.movies.commonFakes.FakeMoviesRepository
 import edu.dyds.movies.domain.entity.Movie
+import edu.dyds.movies.domain.repository.MoviesRepository
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -24,20 +27,22 @@ class UseCaseTests {
         popularity = 7.5,
         voteAverage = 8.0
     )
-    private lateinit var repository: FakeMoviesRepository
+
+    lateinit var repository: MoviesRepository
+
     private lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
     private lateinit var getPopularMoviesUseCase: GetPopularMoviesUseCase
 
     @Before
     fun setUp() {
-        repository = FakeMoviesRepository()
+        repository = mockk()
         getMovieDetailsUseCase = GetMovieDetailsUseCaseImpl(repository)
         getPopularMoviesUseCase = GetPopularMoviesUseCaseImpl(repository, MovieQualifier())
     }
 
     @Test
     fun `dado un repositorio con la pelicula, al solicitar el detalle, devuelve esa pelicula`() = runTest {
-        repository.movieDetail = default
+        coEvery { repository.getMovieByTitle("Fake Movie") } returns default
 
         val result = getMovieDetailsUseCase.getMovieDetails("Fake Movie")
 
@@ -47,15 +52,16 @@ class UseCaseTests {
     @Test
     fun `al solicitar el detalle con un titulo específico, el repositorio recibe ese mismo titulo`() = runTest {
         val movieTitle = "The Matrix"
+        coEvery { repository.getMovieByTitle(movieTitle) } returns null
 
         getMovieDetailsUseCase.getMovieDetails(movieTitle)
 
-        assertEquals(movieTitle, repository.requestedMovieDetailTitle)
+        coVerify(exactly = 1) { repository.getMovieByTitle(movieTitle) }
     }
 
     @Test
     fun `si el repositorio no encuentra la pelicula, getMovieDetails devuelve null`() = runTest {
-        repository.movieDetail = null
+        coEvery { repository.getMovieByTitle("Unknown") } returns null
 
         val result = getMovieDetailsUseCase.getMovieDetails("Unknown")
 
@@ -67,7 +73,8 @@ class UseCaseTests {
         val badMovie = default.copy(id = 1, title = "Bad Movie", voteAverage = 5.9)
         val bestMovie = default.copy(id = 2, title = "Best Movie", voteAverage = 9.0)
         val goodMovie = default.copy(id = 3, title = "Good Movie", voteAverage = 6.0)
-        repository.popularMovies = listOf(badMovie, bestMovie, goodMovie)
+
+        coEvery { repository.getPopularMovies() } returns listOf(badMovie, bestMovie, goodMovie)
 
         val result = getPopularMoviesUseCase.GetPopularMovies()
 
@@ -83,12 +90,10 @@ class UseCaseTests {
 
     @Test
     fun `si el repositorio no tiene peliculas, getPopularMovies devuelve lista vacia`() = runTest {
-        repository.popularMovies = emptyList()
+        coEvery { repository.getPopularMovies() } returns emptyList()
 
         val result = getPopularMoviesUseCase.GetPopularMovies()
 
         assertEquals(emptyList<QualifiedMovie>(), result)
     }
 }
-
-

@@ -1,11 +1,10 @@
-package edu.dyds.movies.data.external.tmdb
+package edu.dyds.movies.data.external
 
-import edu.dyds.movies.data.external.MovieDetailExternalSource
-import edu.dyds.movies.data.external.MovieExternalSourceBroker
 import edu.dyds.movies.domain.entity.Movie
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import java.io.IOException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -42,7 +41,7 @@ class MovieExternalSourceBrokerTest {
         val tmdbMovie = movie(title = "Inception", overview = "TMDB overview")
 
         coEvery { tmdbSource.getMovieByTitle("Inception") } returns tmdbMovie
-        coEvery { omdbSource.getMovieByTitle("Inception") } throws java.io.IOException("boom")
+        coEvery { omdbSource.getMovieByTitle("Inception") } throws IOException("boom")
 
         val broker = MovieExternalSourceBroker(tmdbSource, omdbSource)
 
@@ -57,7 +56,7 @@ class MovieExternalSourceBrokerTest {
         val omdbSource = mockk<MovieDetailExternalSource>()
         val omdbMovie = movie(title = "Inception", overview = "OMDB overview")
 
-        coEvery { tmdbSource.getMovieByTitle("Inception") } throws java.io.IOException("boom")
+        coEvery { tmdbSource.getMovieByTitle("Inception") } throws IOException("boom")
         coEvery { omdbSource.getMovieByTitle("Inception") } returns omdbMovie
 
         val broker = MovieExternalSourceBroker(tmdbSource, omdbSource)
@@ -72,7 +71,7 @@ class MovieExternalSourceBrokerTest {
         val tmdbSource = mockk<MovieDetailExternalSource>()
         val omdbSource = mockk<MovieDetailExternalSource>()
 
-        coEvery { tmdbSource.getMovieByTitle("Unknown") } throws java.io.IOException("boom")
+        coEvery { tmdbSource.getMovieByTitle("Unknown") } throws IOException("boom")
         coEvery { omdbSource.getMovieByTitle("Unknown") } returns null
 
         val broker = MovieExternalSourceBroker(tmdbSource, omdbSource)

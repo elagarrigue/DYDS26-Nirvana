@@ -60,25 +60,25 @@ class MoviesLocalDataTest {
         assertTrue(localDataSource.getPopularMoviesFromCache().isEmpty())
     }
     @Test
-    fun `en una cache con varias películas, al buscar por un id existente, retorna la película correcta`() = runTest {
+    fun `en una cache con varias películas, al buscar por un titulo existente, retorna la película correcta`() = runTest {
         val targetMovie = default.copy(id = 42, title = "Inception")
         localDataSource.savePopularMovies(listOf(default.copy(id = 1), targetMovie, default.copy(id = 3)))
 
-        val result = localDataSource.getMovieDetailFromCache(42)
+        val result = localDataSource.getMovieDetailFromCache("Inception")
 
         assertEquals(targetMovie, result)
     }
     @Test
-    fun `dado un id que no existe en cache, al buscar por ese id, retorna null`() = runTest {
+    fun `dado un titulo que no existe en cache, al buscar por ese titulo, retorna null`() = runTest {
         localDataSource.savePopularMovies(listOf(default.copy(id = 1), default.copy(id = 2)))
 
-        val result = localDataSource.getMovieDetailFromCache(99)
+        val result = localDataSource.getMovieDetailFromCache("Unknown")
 
         assertNull(result)
     }
     @Test
-    fun `dada una cache vacia, al buscar el detalle de una pelicula por id, retorna null`() = runTest {
-        val result = localDataSource.getMovieDetailFromCache(1)
+    fun `dada una cache vacia, al buscar el detalle de una pelicula por titulo, retorna null`() = runTest {
+        val result = localDataSource.getMovieDetailFromCache("Any Movie")
 
         assertNull(result)
     }

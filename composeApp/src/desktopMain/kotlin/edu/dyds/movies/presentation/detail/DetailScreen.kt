@@ -35,14 +35,14 @@ private val DetailLineHeight = 18.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(viewModel: DetailViewModel, id: Int, onBack: () -> Unit) {
+fun DetailScreen(viewModel: DetailViewModel, title: String, onBack: () -> Unit) {
 
     val state by viewModel.movieDetailStateFlow.collectAsState(MovieDetailUiState())
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    LaunchedEffect(id) {
-        viewModel.getMovieDetail(id)
+    LaunchedEffect(title) {
+        viewModel.getMovieDetail(title)
     }
 
     MaterialTheme {
@@ -63,7 +63,7 @@ fun DetailScreen(viewModel: DetailViewModel, id: Int, onBack: () -> Unit) {
                     MovieDetailContent(movie = movie, modifier = Modifier.padding(padding))
                 } ?: run {
                     if (!state.isLoading) {
-                        NoResults { viewModel.getMovieDetail(id) }
+                        NoResults { viewModel.getMovieDetail(title) }
                     }
                 }
             }

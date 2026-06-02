@@ -64,13 +64,13 @@ class DetailViewModelTest {
         val job = testScope.launch {
             viewModel.movieDetailStateFlow.collect { events.add(it) }
         }
-        coEvery { useCase.getMovieDetails(1) } returns default
+        coEvery { useCase.getMovieDetails("Fake Movie") } returns default
 
-        viewModel.getMovieDetail(1)
+        viewModel.getMovieDetail("Fake Movie")
         advanceUntilIdle()
 
         assertEquals(default, events.last().movie)
-        coVerify(exactly = 1) { useCase.getMovieDetails(1) }
+        coVerify(exactly = 1) { useCase.getMovieDetails("Fake Movie") }
         job.cancel()
     }
 
@@ -80,13 +80,13 @@ class DetailViewModelTest {
         val job = testScope.launch {
             viewModel.movieDetailStateFlow.collect { events.add(it) }
         }
-        coEvery { useCase.getMovieDetails(99) } returns null
+        coEvery { useCase.getMovieDetails("Unknown") } returns null
 
-        viewModel.getMovieDetail(99)
+        viewModel.getMovieDetail("Unknown")
         advanceUntilIdle()
 
         assertNull(events.last().movie)
-        coVerify(exactly = 1) { useCase.getMovieDetails(99) }
+        coVerify(exactly = 1) { useCase.getMovieDetails("Unknown") }
         job.cancel()
     }
 
@@ -104,19 +104,19 @@ class DetailViewModelTest {
             viewModel.movieDetailStateFlow.collect { events.add(it) }
         }
         val otherMovie = default.copy(id = 2, title = "Fake Movie 2")
-        coEvery { useCase.getMovieDetails(1) } returns default
-        coEvery { useCase.getMovieDetails(2) } returns otherMovie
+        coEvery { useCase.getMovieDetails("Fake Movie") } returns default
+        coEvery { useCase.getMovieDetails("Fake Movie 2") } returns otherMovie
 
-        viewModel.getMovieDetail(1)
+        viewModel.getMovieDetail("Fake Movie")
         advanceUntilIdle()
 
-        viewModel.getMovieDetail(2)
+        viewModel.getMovieDetail("Fake Movie 2")
         advanceUntilIdle()
 
         assertTrue(events.any { it.movie == default })
         assertEquals(otherMovie, events.last().movie)
-        coVerify(exactly = 1) { useCase.getMovieDetails(1) }
-        coVerify(exactly = 1) { useCase.getMovieDetails(2) }
+        coVerify(exactly = 1) { useCase.getMovieDetails("Fake Movie") }
+        coVerify(exactly = 1) { useCase.getMovieDetails("Fake Movie 2") }
         job.cancel()
     }
 
@@ -126,12 +126,12 @@ class DetailViewModelTest {
         val job = testScope.launch {
             viewModel.movieDetailStateFlow.collect { events.add(it) }
         }
-        coEvery { useCase.getMovieDetails(1) } coAnswers {
+        coEvery { useCase.getMovieDetails("Fake Movie") } coAnswers {
             delay(10)
             default
         }
 
-        viewModel.getMovieDetail(1)
+        viewModel.getMovieDetail("Fake Movie")
 
         assertTrue(events.any { it.isLoading })
 

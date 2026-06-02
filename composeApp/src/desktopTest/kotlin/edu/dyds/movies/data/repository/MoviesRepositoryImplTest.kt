@@ -1,69 +1,121 @@
 package edu.dyds.movies.data.repository
 
-import edu.dyds.movies.commonFakes.FakeMoviesLocalDataSource
-import edu.dyds.movies.commonFakes.FakeMoviesRemoteDataSource
-import edu.dyds.movies.data.remote.mapper.MovieMapper
+import edu.dyds.movies.data.external.MovieDetailExternalSource
+import edu.dyds.movies.data.external.PopularMoviesExternalSource
+import edu.dyds.movies.data.local.MoviesLocalDataSource
 import edu.dyds.movies.domain.entity.Movie
-import edu.dyds.movies.data.remote.RemoteMovie
-import edu.dyds.movies.data.remote.RemoteResult
-import kotlinx.coroutines.runBlocking
-import kotlin.test.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class MoviesRepositoryImplTest {
-    private lateinit var remoteDataSource: FakeMoviesRemoteDataSource
-    private lateinit var localDataSource: FakeMoviesLocalDataSource
-    private lateinit var movieMapper: MovieMapper
+
+    private lateinit var movieDetailExternalSource: MovieDetailExternalSource
+    private lateinit var popularMoviesExternalSource: PopularMoviesExternalSource
+    private lateinit var localDataSource: MoviesLocalDataSource
     private lateinit var repository: MoviesRepositoryImpl
 
     @BeforeTest
     fun setup() {
-        remoteDataSource = FakeMoviesRemoteDataSource()
-        localDataSource = FakeMoviesLocalDataSource()
-        movieMapper = MovieMapper()
-        repository = MoviesRepositoryImpl(remoteDataSource, localDataSource, movieMapper)
-    }
-
-    @Test
-    fun `teniendo películas en cache, al llamar a getPopularMovies, se devuelven las películas en cache sin consultar remoto`() = runBlocking {
-        val cachedMovies = listOf(Movie(1, "title", "overview", "2020-01-01", "poster", null, "originalTitle", "en", 1.0, 8.0))
-        localDataSource.cachedMovies = cachedMovies
-        val result = repository.getPopularMovies()
-        assertEquals(cachedMovies, result)
-    }
-
-    @Test
-    fun `realiza búsquedas desde el servidor remoto y almacena en caché, si la caché está vacía`() = runBlocking {
-        localDataSource.cachedMovies = emptyList()
-        val remoteMovie = RemoteMovie(1, "title", "overview", "2020-01-01", "/poster.jpg", null, "originalTitle", "en", 1.0, 8.0)
-        remoteDataSource.remoteResult = RemoteResult(
-            page = 1,
-            results = listOf(remoteMovie),
-            totalPages = 1,
-            totalResults = 1
+        movieDetailExternalSource = mockk()
+        popularMoviesExternalSource = mockk()
+        localDataSource = mockk()
+        repository = MoviesRepositoryImpl(
+            movieDetailExternalSource = movieDetailExternalSource,
+            popularMoviesExternalSource = popularMoviesExternalSource,
+            localDataSource = localDataSource
         )
+    }
+
+    @Test
+    fun `si hay cache de populares devuelve cache y no consulta remoto`() = runTest {
+        val cachedMovies = listOf(movie(id = 1, title = "Cached"))
+        coEvery { localDataSource.getPopularMoviesFromCache() } returns cachedMovies
+
         val result = repository.getPopularMovies()
-        assertEquals(1, result.size)
-        assertEquals("title", result[0].title)
-        assertEquals(remoteMovie.id, result[0].id)
-        assertEquals(listOf(movieMapper.toDomainMovie(remoteMovie)), localDataSource.savedMovies)
+
+        assertEquals(cachedMovies, result)
+        coVerify(exactly = 0) { popularMoviesExternalSource.getPopularMovies() }
+        coVerify(exactly = 0) { localDataSource.savePopularMovies(any()) }
     }
 
     @Test
-    fun `dado que remoto tiene datos de la película, al llamar a getMovieDetail, devuelve los detalles de la película desde remote si están disponibles`() = runBlocking {
-        val remoteMovie = RemoteMovie(2, "title2", "overview2", "2020-02-02", "/poster2.jpg", null, "originalTitle2", "es", 2.0, 7.0)
-        remoteDataSource.remoteMovie = remoteMovie
-        val result = repository.getMovieDetail(2)
-        assertNotNull(result)
-        assertEquals(remoteMovie.id, result.id)
+    fun `si cache popular esta vacia consulta remoto y guarda en cache`() = runTest {
+        val remoteMovies = listOf(movie(id = 2, title = "Remote"))
+        coEvery { localDataSource.getPopularMoviesFromCache() } returns emptyList()
+        coEvery { popularMoviesExternalSource.getPopularMovies() } returns remoteMovies
+        coEvery { localDataSource.savePopularMovies(remoteMovies) } returns Unit
+
+        val result = repository.getPopularMovies()
+
+        assertEquals(remoteMovies, result)
+        coVerify(exactly = 1) { popularMoviesExternalSource.getPopularMovies() }
+        coVerify(exactly = 1) { localDataSource.savePopularMovies(remoteMovies) }
     }
 
     @Test
-    fun `en caso de error remoto, se recurre a la caché local`() = runBlocking {
-        remoteDataSource.shouldThrow = true
-        val cachedMovie = Movie(3, "title3", "overview3", "2020-03-03", "poster3", null, "originalTitle3", "fr", 3.0, 6.0)
-        localDataSource.cachedMovieDetail = cachedMovie
-        val result = repository.getMovieDetail(3)
+    fun `si detalle remoto falla usa cache local como fallback`() = runTest {
+        val cachedMovie = movie(id = 3, title = "Inception", overview = "Cached overview")
+        coEvery { movieDetailExternalSource.getMovieByTitle("Inception") } throws java.io.IOException("boom")
+        coEvery { localDataSource.getMovieDetailFromCache("Inception") } returns cachedMovie
+
+        val result = repository.getMovieByTitle("Inception")
+
         assertEquals(cachedMovie, result)
+        coVerify(exactly = 1) { movieDetailExternalSource.getMovieByTitle("Inception") }
+        coVerify(exactly = 1) { localDataSource.getMovieDetailFromCache("Inception") }
     }
-}
 
+    @Test
+    fun `si detalle remoto devuelve una pelicula la retorna sin consultar cache`() = runTest {
+        val remoteMovie = movie(id = 4, title = "Dune", overview = "Remote overview")
+        coEvery { movieDetailExternalSource.getMovieByTitle("Dune") } returns remoteMovie
+
+        val result = repository.getMovieByTitle("Dune")
+
+        assertEquals(remoteMovie, result)
+        coVerify(exactly = 1) { movieDetailExternalSource.getMovieByTitle("Dune") }
+        coVerify(exactly = 0) { localDataSource.getMovieDetailFromCache(any()) }
+    }
+
+    @Test
+    fun `si detalle remoto falla y cache esta vacia devuelve null`() = runTest {
+        coEvery { movieDetailExternalSource.getMovieByTitle("Unknown") } throws java.io.IOException("boom")
+        coEvery { localDataSource.getMovieDetailFromCache("Unknown") } returns null
+
+        val result = repository.getMovieByTitle("Unknown")
+
+        assertNull(result)
+        coVerify(exactly = 1) { movieDetailExternalSource.getMovieByTitle("Unknown") }
+        coVerify(exactly = 1) { localDataSource.getMovieDetailFromCache("Unknown") }
+    }
+
+    private fun movie(
+        id: Int,
+        title: String,
+        overview: String = "Overview",
+        releaseDate: String = "2024-01-01",
+        poster: String = "https://poster.jpg",
+        backdrop: String? = "https://backdrop.jpg",
+        originalTitle: String = title,
+        originalLanguage: String = "en",
+        popularity: Double = 8.0,
+        voteAverage: Double = 7.5
+    ): Movie = Movie(
+        id = id,
+        title = title,
+        overview = overview,
+        releaseDate = releaseDate,
+        poster = poster,
+        backdrop = backdrop,
+        originalTitle = originalTitle,
+        originalLanguage = originalLanguage,
+        popularity = popularity,
+        voteAverage = voteAverage
+    )
+}

@@ -10,6 +10,7 @@
 .idea/**/dictionaries
 .idea/**/shelf
 plan_reorganizacion/
+Plan/
 
 # AWS User-specific
 .idea/**/aws.xml

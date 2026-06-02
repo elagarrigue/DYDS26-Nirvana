@@ -1,15 +1,15 @@
-package edu.dyds.movies.data.remote
+package edu.dyds.movies.data.external.tmdb
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoteMovie(
+data class RemoteTMDB(
     val id: Int,
     val title: String,
     val overview: String,
     @SerialName("release_date") val releaseDate: String,
-    @SerialName("poster_path") val posterPath: String,
+    @SerialName("poster_path") val posterPath: String?,
     @SerialName("backdrop_path") val backdropPath: String?,
     @SerialName("original_title") val originalTitle: String,
     @SerialName("original_language") val originalLanguage: String,
